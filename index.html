@@ -838,10 +838,31 @@
             else{w.classList.add('opacity-0','pointer-events-none','translate-y-10');w.classList.remove('opacity-100','translate-y-0');}
         }
 
-        function sendChat() {
+        async function sendChat() {
             const inp=$('chat-input'), msgs=$('chat-msgs'), q=inp.value.trim(); if(!q) return;
             msgs.innerHTML+=`<div class="flex items-start gap-2 max-w-[85%] self-end flex-row-reverse"><div class="w-7 h-7 rounded-full bg-charcoal text-white flex items-center justify-center text-[10px] shrink-0 border border-gold/20">U</div><div class="bg-gold text-obsidian p-3 rounded-xl rounded-tl-none text-xs leading-relaxed font-semibold">${q}</div></div>`;
             inp.value=''; msgs.scrollTop=msgs.scrollHeight;
+            const thinkId='think-'+Date.now();
+            msgs.innerHTML+=`<div id="${thinkId}" class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div class="flex items-center gap-2"><span class="w-2 h-2 bg-gold rounded-full animate-bounce"></span><span class="w-2 h-2 bg-gold rounded-full animate-bounce" style="animation-delay:0.1s"></span><span class="w-2 h-2 bg-gold rounded-full animate-bounce" style="animation-delay:0.2s"></span></div></div></div>`;
+            msgs.scrollTop=msgs.scrollHeight;
+            let aiFailed=false;
+            try{
+                const res=await fetch('/.netlify/functions/gemini-chat',{
+                    method:'POST',headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({question:q,lang})
+                });
+                if(res.ok){
+                    const data=await res.json();
+                    if(data.reply){
+                        const talk=data.reply.replace(/\n/g,'<br>');
+                        $(thinkId).outerHTML=`<div class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div>${talk}</div></div></div>`;
+                        msgs.scrollTop=msgs.scrollHeight; return;
+                    }
+                }
+            }catch(e){}
+            aiFailed=true;
+            const thinkEl=$(thinkId);
+            if(!thinkEl) return;
             setTimeout(()=>{
                 let reply='',img=''; const lq=q.toLowerCase();
                 const match=aiBlocks.find(b=>{const t=b.topic.toLowerCase(); return lq.includes(t)||t.includes(lq);});
@@ -869,9 +890,9 @@
                     }
                 }
                 const ih=typeof img==='string'&&img.startsWith('<')?`<div class="mt-2 space-y-1">${img}</div>`:img?`<div class="mt-2 rounded-lg overflow-hidden border border-gold/20 h-24 w-full"><img src="${img}" class="w-full h-full object-cover"></div>`:'';
-                msgs.innerHTML+=`<div class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div>${reply}</div>${ih}</div></div>`;
+                thinkEl.outerHTML=`<div class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div>${reply}</div>${ih}</div></div>`;
                 msgs.scrollTop=msgs.scrollHeight;
-            },800);
+            }, aiFailed ? 800 : 200);
         }
 
         // ════════════════════════════════════════════════════════════════

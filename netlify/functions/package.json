@@ -1,7 +1,8 @@
 {
-    "name":  "elite-estates-functions",
-    "version":  "1.0.0",
-    "dependencies":  {
-                         "pg":  "latest"
-                     }
+    "name": "elite-estates-functions",
+    "version": "1.0.0",
+    "dependencies": {
+        "@supabase/supabase-js": "latest",
+        "pg": "latest"
+    }
 }
