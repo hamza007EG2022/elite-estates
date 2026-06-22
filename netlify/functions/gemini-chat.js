@@ -77,8 +77,7 @@ exports.handler = async (event) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          system_instruction: { parts: [{ text: lang === 'ar' ? sysAr : sysEn }] },
-          contents: [{ role: 'user', parts: [{ text: question }] }],
+          contents: [{ role: 'user', parts: [{ text: `${lang === 'ar' ? sysAr : sysEn}\n\nسؤال العميل: ${question}` }] }],
           generationConfig: { temperature: 0.7, maxOutputTokens: 600, topP: 0.95, topK: 40 },
         }),
       }
