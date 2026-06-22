@@ -72,7 +72,7 @@ exports.handler = async (event) => {
     const sysEn = `You are Saleem, the exclusive real estate consultant for Elite Estates in Egypt. Your tone is highly professional, prestigious, and tailored to VIP (Class A) buyers. Use warm Egyptian hospitality phrases. Use ONLY the provided database context below to answer. If a property is sold or unavailable, politely inform the client and suggest other active premium alternatives from the data. Never hallucinate or invent fake properties.\n\n${context || 'No database data available. Reply with a polite general response.'}\n\nAlways remember: You are Saleem, Elite Estates consultant.`;
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
