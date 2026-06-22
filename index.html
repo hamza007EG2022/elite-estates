@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -399,8 +398,12 @@
 
         const useSupabase = SUPABASE_URL.includes('YOUR_PROJECT') === false;
         let supabase = null;
-        if (useSupabase) {
+        async function initSupabase() {
+            if (!useSupabase) return;
             try {
+                if (typeof window.supabase === 'undefined') {
+                    await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+                }
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } catch(e) { console.warn('Supabase init failed'); }
         }
@@ -483,12 +486,12 @@
         async function loadFromSupabase() {
             if (!useSupabase || !supabase) return false;
             const [p, l, a] = await Promise.all([sbFetch('properties'), sbFetch('leads'), sbFetch('ai_knowledge')]);
-            if (p) {
+            if (p && p.length) {
                 properties = p.map(x => ({ ...x, images: typeof x.images === 'string' ? JSON.parse(x.images) : (x.images || []) }));
                 saveLocal();
             }
-            if (l) { leads = l; saveLocal(); }
-            if (a) { aiBlocks = a; saveLocal(); }
+            if (l && l.length) { leads = l; saveLocal(); }
+            if (a && a.length) { aiBlocks = a; saveLocal(); }
             return !!(p || l || a);
         }
 
@@ -523,7 +526,9 @@
         //  SYNC: Upload local data TO Supabase
         // ════════════════════════════════════════════════════════════════
         async function syncFromSupabase() {
-            if (!useSupabase || !supabase) { toast('Supabase غير مهيأ. عبي الـ URL والمفتاح.', false); return; }
+            if (!useSupabase) { toast('Supabase غير مهيأ. عبي الـ URL والمفتاح.', false); return; }
+            await initSupabase();
+            if (!supabase) { toast('Supabase غير مهيأ.', false); return; }
             btnLoad('btn-sync', true);
             const ok = await loadFromSupabase();
             if (ok) {
@@ -854,6 +859,7 @@
         window.onload=async()=>{
             loader(true);
             loadLocal();
+            await initSupabase();
             if (useSupabase) {
                 const ok = await loadFromSupabase();
                 updateDBStatus(ok);
