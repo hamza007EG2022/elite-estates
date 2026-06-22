@@ -439,6 +439,7 @@
             { id:2, titleAr:'بنتهاوس زجاجي | الشيخ زايد', titleEn:'Glass Penthouse | Zayed', type:'apartment', location:'zayed', price:24, beds:3, baths:4, area:340, finAr:'ألترا سوبر لوكس', finEn:'Ultra Super Lux', descAr:'بنتهاوس بانورامي.', descEn:'Panoramic penthouse.', images:['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=800'] },
             { id:3, titleAr:'فيلا أمواج | الساحل الشمالي', titleEn:'Crystal Waves | North Coast', type:'villa', location:'sahel', price:65, beds:5, baths:6, area:520, finAr:'ألترا سوبر لوكس', finEn:'Ultra Super Lux', descAr:'فيلا صف أول على البحر.', descEn:'First-row sea villa.', images:['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800','https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=800'] }
         ];
+        const defAIVer = 1;
         const defAI = [
             { id:1, topic:'جمصة', content:'.', status:'active', image:'' },
             { id:2, topic:'تقسيط', content:'نظام سداد حتى 7 سنين بدون فوائد بنكية وبعض المطورين يقبلون شيكات.', status:'active', image:'' },
@@ -517,6 +518,7 @@
                 localStorage.setItem('ee_leads', JSON.stringify(leads));
                 localStorage.setItem('ee_ai', JSON.stringify(aiBlocks));
                 localStorage.setItem('ee_cfg', JSON.stringify(config));
+                localStorage.setItem('ee_ai_ver', String(defAIVer));
             } catch(e) {}
         }
 
@@ -526,12 +528,16 @@
                 const l = localStorage.getItem('ee_leads');
                 const a = localStorage.getItem('ee_ai');
                 const c = localStorage.getItem('ee_cfg');
+                const av = localStorage.getItem('ee_ai_ver');
                 if (p) properties = JSON.parse(p);
                 if (l) leads = JSON.parse(l);
-                if (a) aiBlocks = JSON.parse(a);
+                if (av !== String(defAIVer) || !a || !JSON.parse(a).length) {
+                    aiBlocks = JSON.parse(JSON.stringify(defAI)); saveLocal();
+                } else if (a) {
+                    aiBlocks = JSON.parse(a);
+                }
                 if (c) Object.assign(config, JSON.parse(c));
                 if (!p || !properties.length) { properties = JSON.parse(JSON.stringify(defProps)); saveLocal(); }
-                if (!a || !aiBlocks.length) { aiBlocks = JSON.parse(JSON.stringify(defAI)); saveLocal(); }
             } catch(e) { properties = JSON.parse(JSON.stringify(defProps)); aiBlocks = JSON.parse(JSON.stringify(defAI)); }
         }
 
@@ -844,9 +850,14 @@
                     else if(match.content&&match.content!=='.'){reply=match.content; if(match.image) img=match.image;}
                 }
                 if(!reply||reply==='.'){
+                    const keywords=lq.replace(/[?؟!,.\s]+/g,' ').trim().split(' ').filter(w=>w.length>2);
                     const pMatch=properties.filter(p=>{
                         const t=(p.titleAr+' '+p.titleEn+' '+p.location+' '+p.type).toLowerCase();
-                        return lq.split(' ').some(w=>w.length>2&&t.includes(w));
+                        return keywords.some(w=>{
+                            if(t.includes(w)) return true;
+                            const stem=w.replace(/^[فوبل]/,'');
+                            return stem.length>2&&(t.includes(stem)||stem.includes(t));
+                        });
                     });
                     if(pMatch.length){
                         const base=pMatch.slice(0,2);
