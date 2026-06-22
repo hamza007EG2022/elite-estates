@@ -1,0 +1,8 @@
+{
+    "private":  true,
+    "name":  "elite-estates",
+    "version":  "1.0.0",
+    "dependencies":  {
+                         "pg":  "latest"
+                     }
+}

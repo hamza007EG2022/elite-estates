@@ -1,0 +1,8 @@
+node_modules/
+.netlify/
+*.zip
+sqlbody.json
+body*.json
+rename.json
+github-link.json
+supabase-setup/
