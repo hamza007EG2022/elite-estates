@@ -440,8 +440,21 @@
             { id:3, titleAr:'فيلا أمواج | الساحل الشمالي', titleEn:'Crystal Waves | North Coast', type:'villa', location:'sahel', price:65, beds:5, baths:6, area:520, finAr:'ألترا سوبر لوكس', finEn:'Ultra Super Lux', descAr:'فيلا صف أول على البحر.', descEn:'First-row sea villa.', images:['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800','https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=800'] }
         ];
         const defAI = [
-            { id:1, topic:'جمصة', content:'فيلا جمصة صف أول على البحر.', status:'active', image:'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=800' },
-            { id:2, topic:'تقسيط', content:'نظام سداد حتى 7 سنوات بدون فوائد.', status:'active', image:'' }
+            { id:1, topic:'جمصة', content:'.', status:'active', image:'' },
+            { id:2, topic:'تقسيط', content:'نظام سداد حتى 7 سنين بدون فوائد بنكية وبعض المطورين يقبلون شيكات.', status:'active', image:'' },
+            { id:3, topic:'التجمع', content:'منطقة حيوية في القاهرة الجديدة، تضم كمبوندات فاخرة وقصور.', status:'active', image:'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=800' },
+            { id:4, topic:'الساحل', content:'الساحل الشمالي وجهة المصيف الأولى بوحدات صف أول ولاف.', status:'active', image:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800' },
+            { id:5, topic:'الشيخ زايد', content:'مدينة الشيخ زايد من أفضل أحياء 6 أكتوبر للفلل والبنتهاوسات.', status:'active', image:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800' },
+            { id:6, topic:'ڤيلا', content:'.', status:'active', image:'' },
+            { id:7, topic:'شقة', content:'.', status:'active', image:'' },
+            { id:8, topic:'بنتهاوس', content:'.', status:'active', image:'' },
+            { id:9, topic:'تمويل', content:'نوفر خطط تمويل مرنة بالتعاون مع البنوك المصرية.', status:'active', image:'' },
+            { id:10, topic:'استلام', content:'جميع الوحدات جاهزة للتسليم الفوري أو خلال 6 شهور.', status:'active', image:'' },
+            { id:11, topic:'مصر الجديدة', content:'منطقة عريقة فيها عمارات وفيلات كلاسيك.', status:'active', image:'' },
+            { id:12, topic:'مستعمل', content:'لدينا وحدات مستعملة بحالة ممتازة بأسعار أقل.', status:'active', image:'' },
+            { id:13, topic:'سعر', content:'الأسعار تبدأ من 18 مليون للشقق وتصل لـ65 مليون للفلل.', status:'active', image:'' },
+            { id:14, topic:'مواصفات', content:'ألترا سوبر لوكس — تشطيب راقي بأعلى الخامات.', status:'active', image:'' },
+            { id:15, topic:'مساحة', content:'وحدات من 250 متر مربع حتى 820 متر.', status:'active', image:'' }
         ];
 
         // ════════════════════════════════════════════════════════════════
@@ -827,11 +840,24 @@
                 let reply='',img=''; const lq=q.toLowerCase();
                 const match=aiBlocks.find(b=>{const t=b.topic.toLowerCase(); return lq.includes(t)||t.includes(lq);});
                 if(match){
-                    if(match.status==='sold') reply=lang==='ar'?`[${match.topic}] تم البيع. بدائل متاحة.`:`[${match.topic}] sold. Alternatives available.`;
-                    else{reply=match.content; if(match.image) img=match.image;}
+                    if(match.status==='sold') reply=lang==='ar'?`تم البيع. بدائل متاحة.`:`Sold. Alternatives available.`;
+                    else if(match.content&&match.content!=='.'){reply=match.content; if(match.image) img=match.image;}
                 }
-                if(!reply) reply=lang==='ar'?'تم التسجيل، سنتواصل قريباً.':'Noted, will contact you.';
-                const ih=img?`<div class="mt-2 rounded-lg overflow-hidden border border-gold/20 h-24 w-full"><img src="${img}" class="w-full h-full object-cover"></div>`:'';
+                if(!reply||reply==='.'){
+                    const pMatch=properties.filter(p=>{
+                        const t=(p.titleAr+' '+p.titleEn+' '+p.location+' '+p.type).toLowerCase();
+                        return lq.split(' ').some(w=>w.length>2&&t.includes(w));
+                    });
+                    if(pMatch.length){
+                        const base=pMatch.slice(0,2);
+                        const cards=base.map(p=>`<div class="bg-obsidian/60 rounded-lg p-2 flex gap-2 items-center mt-2"><img src="${p.images[0]}" class="w-12 h-12 rounded object-cover shrink-0"><div class="text-[10px]"><div class="text-white font-semibold">${lang==='ar'?p.titleAr:p.titleEn}</div><div class="text-gold">${p.price}M ${lang==='ar'?'ج':'EGP'}</div></div></div>`).join('');
+                        reply=lang==='ar'?`وجدت ${pMatch.length} عقار مناسب:`:`Found ${pMatch.length} matching properties:`;
+                        img=cards;
+                    } else {
+                        reply=lang==='ar'?'شكراً لاهتمامك. فريقنا سيتواصل معك قريباً لتقديم أفضل العروض.' : 'Thank you. Our team will contact you shortly with the best offers.';
+                    }
+                }
+                const ih=typeof img==='string'&&img.startsWith('<')?`<div class="mt-2 space-y-1">${img}</div>`:img?`<div class="mt-2 rounded-lg overflow-hidden border border-gold/20 h-24 w-full"><img src="${img}" class="w-full h-full object-cover"></div>`:'';
                 msgs.innerHTML+=`<div class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div>${reply}</div>${ih}</div></div>`;
                 msgs.scrollTop=msgs.scrollHeight;
             },800);
