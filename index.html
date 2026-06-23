@@ -101,6 +101,10 @@
                 <span class="text-[9px] uppercase tracking-[0.3em] text-white/50 -mt-1 font-sans" id="subtitle">Private Portfolio</span>
             </a>
             <div class="flex items-center gap-3">
+                <button onclick="navigate('news')" class="bg-charcoal border border-white/10 hover:border-gold/30 px-4 py-2 rounded-full flex items-center gap-2 text-white hover:text-gold transition-all text-xs">
+                    <span class="material-icons text-sm">newspaper</span>
+                    <span class="hidden md:inline" id="nav-news">النشرة العقارية</span>
+                </button>
                 <button onclick="navigate('dashboard')" class="bg-charcoal border border-white/10 hover:border-gold/30 px-4 py-2 rounded-full flex items-center gap-2 text-white hover:text-gold transition-all text-xs">
                     <span class="material-icons text-sm">admin_panel_settings</span>
                     <span class="hidden md:inline">بوابة الإدارة</span>
@@ -198,15 +202,6 @@
             </div>
         </section>
 
-        <section class="py-24 px-6 max-w-7xl mx-auto" id="news-section">
-            <div class="flex flex-col items-center text-center mb-16">
-                <span class="text-gold text-xs font-bold uppercase tracking-widest mb-3" id="news-sub">النشرة العقارية اليومية</span>
-                <h2 class="serif-title text-3xl md:text-5xl font-light text-white mb-4" id="news-title">أخبار السوق</h2>
-                <p class="text-white/50 text-sm max-w-lg font-sans" id="news-desc">تابع آخر التحديثات</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="news-grid"></div>
-        </section>
-
         <section class="py-24 px-6 max-w-4xl mx-auto" id="contact">
             <div class="glass-panel rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden">
                 <div class="absolute -top-12 -left-12 w-32 h-32 bg-gold/5 rounded-full blur-xl"></div>
@@ -225,6 +220,21 @@
                 </form>
             </div>
         </section>
+    </div>
+
+    <!-- ===== NEWS VIEW ===== -->
+    <div id="view-news" class="view-panel hidden pt-32 pb-24 px-6 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
+            <div>
+                <button onclick="navigate('site')" class="mb-4 bg-charcoal border border-gold/30 hover:border-gold text-gold hover:scale-105 px-5 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 w-fit">
+                    <span class="material-icons text-sm">arrow_back</span><span id="news-back">العودة للرئيسية</span>
+                </button>
+                <h2 class="serif-title text-3xl md:text-4xl font-light text-white mb-2" id="news-page-title">النشرة العقارية اليومية</h2>
+                <p class="text-white/40 text-xs md:text-sm font-sans" id="news-page-desc">رؤية تحليلية شاملة للسوق العقاري في مصر</p>
+            </div>
+            <div class="flex flex-wrap gap-2" id="news-filter-tabs"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="news-grid"></div>
     </div>
 
     <!-- ===== DETAIL VIEW ===== -->
@@ -611,6 +621,7 @@
             document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
             if (view === 'site') { $('view-site').classList.remove('hidden'); $('header').classList.remove('hidden'); }
             else if (view === 'detail') { $('view-detail').classList.remove('hidden'); $('header').classList.remove('hidden'); if (param) renderDetail(param); }
+            else if (view === 'news') { $('view-news').classList.remove('hidden'); $('header').classList.remove('hidden'); renderNewsFeed(); }
             else if (view === 'dashboard') {
                 $('header').classList.add('hidden');
                 if (verified) { $('view-dashboard').classList.remove('hidden'); renderLeads(); renderAIList(); renderManaged(); renderNewsList();
@@ -852,17 +863,43 @@
             renderNewsFeed();
         }
 
+        let newsFilter = 'الكل';
+
+        function filterNews(cat) {
+            newsFilter = cat;
+            renderNewsFeed();
+        }
+
         function renderNewsFeed() {
             const g = $('news-grid'); if (!g) return;
             g.innerHTML = '';
             const s = trans[lang];
-            $('news-sub').textContent = s.nh;
-            $('news-title').textContent = s.ns;
-            $('news-desc').textContent = lang === 'ar' ? 'تابع آخر التحديثات' : 'Follow the latest updates';
+            const pageTitle = $('news-page-title');
+            const pageDesc = $('news-page-desc');
+            if (pageTitle) pageTitle.textContent = s.nh;
+            if (pageDesc) pageDesc.textContent = lang === 'ar' ? 'رؤية تحليلية شاملة للسوق العقاري في مصر' : 'Comprehensive analytical view of the Egyptian real estate market';
+            const backBtn = $('news-back');
+            if (backBtn) backBtn.textContent = lang === 'ar' ? 'العودة للرئيسية' : 'Back to Home';
+            const navNews = $('nav-news');
+            if (navNews) navNews.textContent = lang === 'ar' ? 'النشرة العقارية' : 'Market News';
+
+            // build filter tabs
+            const tabs = $('news-filter-tabs');
+            if (tabs) {
+                const cats = ['الكل', 'أخبار السوق', 'العاصمة الإدارية', 'عاجل', 'إعلانات هامة'];
+                const catMap = { 'الكل':'الكل', 'أخبار السوق':'أخبار السوق', 'العاصمة الإدارية':'العاصمة الإدارية', 'عاجل':'عاجل', 'إعلانات هامة':'إعلانات هامة' };
+                if (lang === 'en') {
+                    catMap['الكل']='All'; catMap['أخبار السوق']='Market News'; catMap['العاصمة الإدارية']='New Capital'; catMap['عاجل']='Breaking'; catMap['إعلانات هامة']='Announcements';
+                }
+                tabs.innerHTML = cats.map(c => `<button onclick="filterNews('${c}')" class="text-xs px-4 py-2 rounded-full border transition-all font-bold ${newsFilter === c ? 'bg-gold text-obsidian border-gold' : 'bg-charcoal text-white/60 border-white/10 hover:border-gold/40 hover:text-white'}">${catMap[c] || c}</button>`).join('');
+            }
 
             if (!marketNews.length) { g.innerHTML = '<div class="col-span-full text-center text-white/30 text-xs py-16">لا توجد أخبار حالياً</div>'; return; }
 
-            marketNews.slice().reverse().forEach(item => {
+            const filtered = newsFilter === 'الكل' ? marketNews : marketNews.filter(n => n.category === newsFilter);
+            if (!filtered.length) { g.innerHTML = '<div class="col-span-full text-center text-white/30 text-xs py-16">لا توجد أخبار في هذا التصنيف</div>'; return; }
+
+            filtered.slice().reverse().forEach(item => {
                 const embedUrl = parseStreamable(item.video_url);
                 const catBadge = item.category === 'عاجل'
                     ? 'bg-red-600/20 text-red-400 border-red-500/30'
