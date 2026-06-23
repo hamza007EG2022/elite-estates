@@ -198,6 +198,15 @@
             </div>
         </section>
 
+        <section class="py-24 px-6 max-w-7xl mx-auto" id="news-section">
+            <div class="flex flex-col items-center text-center mb-16">
+                <span class="text-gold text-xs font-bold uppercase tracking-widest mb-3" id="news-sub">النشرة العقارية اليومية</span>
+                <h2 class="serif-title text-3xl md:text-5xl font-light text-white mb-4" id="news-title">أخبار السوق</h2>
+                <p class="text-white/50 text-sm max-w-lg font-sans" id="news-desc">تابع آخر التحديثات</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="news-grid"></div>
+        </section>
+
         <section class="py-24 px-6 max-w-4xl mx-auto" id="contact">
             <div class="glass-panel rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden">
                 <div class="absolute -top-12 -left-12 w-32 h-32 bg-gold/5 rounded-full blur-xl"></div>
@@ -296,6 +305,7 @@
                         <span class="material-icons text-sm">assignment_ind</span> العملاء
                         <span id="leads-badge" class="absolute left-3 top-3 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
                     </button>
+                    <button onclick="switchPanel('news')" id="tab-news" class="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-white transition-all flex items-center gap-2"><span class="material-icons text-sm">newspaper</span> الأخبار</button>
                 </div>
                 <div class="lg:col-span-9 p-8">
 
@@ -363,6 +373,26 @@
                         <div id="ai-list" class="flex flex-col gap-3"></div>
                     </div>
 
+                    <!-- NEWS -->
+                    <div id="panel-news" class="hidden flex flex-col gap-6">
+                        <div class="flex items-center gap-3 border-b border-white/5 pb-2"><span class="material-icons text-gold">newspaper</span><h4 class="serif-title text-base font-bold text-gold">إدارة الأخبار</h4></div>
+                        <div class="bg-charcoal/30 border border-gold/20 p-5 rounded-2xl flex flex-col gap-4">
+                            <h5 class="text-xs text-gold font-bold uppercase tracking-wider">إضافة خبر</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><label class="text-[10px] text-white/50">العنوان</label><input type="text" id="news-title-input" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold"></div>
+                                <div><label class="text-[10px] text-white/50">التصنيف</label>
+                                    <select id="news-cat" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold"><option value="أخبار السوق">أخبار السوق</option><option value="العاصمة الإدارية">العاصمة الإدارية</option><option value="عاجل">عاجل</option><option value="إعلانات هامة">إعلانات هامة</option></select></div>
+                                <div><label class="text-[10px] text-white/50">رابط فيديو (Streamable)</label><input type="text" id="news-video" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold" placeholder="https://streamable.com/..."></div>
+                            </div>
+                            <div><label class="text-[10px] text-white/50">المحتوى (الصق من واتساب Ctrl+V)</label><textarea id="news-content" rows="5" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold whitespace-pre-line"></textarea></div>
+                            <div class="flex gap-3">
+                                <button onclick="addNews()" id="btn-news" class="bg-gold hover:bg-gold-dark text-obsidian px-5 py-2.5 rounded-lg text-xs font-bold transition-all">إضافة</button>
+                                <button onclick="cancelEditNews()" id="btn-news-cancel" class="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-5 py-2.5 rounded-lg text-xs font-bold transition-all hidden">إلغاء</button>
+                            </div>
+                        </div>
+                        <div id="news-list" class="flex flex-col gap-3"></div>
+                    </div>
+
                     <!-- LEADS -->
                     <div id="panel-leads" class="hidden flex flex-col gap-6">
                         <div class="flex items-center gap-3 border-b border-white/5 pb-2"><span class="material-icons text-gold">assignment_ind</span><h4 class="serif-title text-base font-bold text-gold">استفسارات العملاء</h4></div>
@@ -403,7 +433,7 @@
         //  STATE
         // ════════════════════════════════════════════════════════════════
         let lang = 'ar', verified = false, chatOpen = false;
-        let properties = [], leads = [], aiBlocks = [];
+        let properties = [], leads = [], aiBlocks = [], marketNews = [];
         let activeProp = null;
         let config = { brand: 'ELITE ESTATES', bg: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1920', phone: '+201000000000', wa: '201000000000', pass: 'admin' };
 
@@ -417,12 +447,14 @@
             ar: { sub: 'معرض العقارات', cta: 'استشارة', hero: 'نخبة العقارات الفاخرة <br><span class="text-gold font-normal">في مصر</span>', hd: 'أعمال حصرية منتقاة بعناية.', hb: 'تصفح المعرض', fh: 'تصفية', ft: 'النوع', fl: 'الموقع', fp: 'السعر', ff: 'التشطيب',
                 cs: 'الوحدات المتاحة', ct: 'كنوز معمارية', cd: 'وحدات مفحوصة قانونياً.', tt: 'تقنية', ttl: 'جولة افتراضية', td: 'تنقل بين الغرف.', ttech: 'تقنية 360°',
                 aiT: 'المستشار سليم', aiS: 'مساعدك الذكي', aiM: 'مرحباً بك يا فندم. أنا سليم، مستشارك العقاري.', vf: 'دعنا نجد عقارك', vfd: 'اترك بياناتك.',
-                fn: 'الاسم الكريم', fph: 'رقم الجوال', fno: 'تفاصيل', fb: 'إرسال', ftxt: 'نحن لا نوفر مساكن، نحن نرسي قواعد الوجاهة.' },
+                fn: 'الاسم الكريم', fph: 'رقم الجوال', fno: 'تفاصيل', fb: 'إرسال', ftxt: 'نحن لا نوفر مساكن، نحن نرسي قواعد الوجاهة.',
+                nh: 'النشرة العقارية اليومية', ns: 'أخبار السوق', nr: 'عاجل', nc: 'العاصمة الإدارية', nd: 'إعلانات هامة', nw: 'واتساب للمتابعة' },
             en: { sub: 'Private Portfolio', cta: 'Consultation', hero: 'Elite Luxury Properties <br><span class="text-gold font-normal">in Egypt</span>', hd: 'Highly curated private listings.', hb: 'Explore Catalog',
                 fh: 'Filter', ft: 'Type', fl: 'Location', fp: 'Price', ff: 'Finish',
                 cs: 'Active Listings', ct: 'Architectural Marvels', cd: 'Legally vetted units.', tt: 'Tech', ttl: 'Virtual Tour', td: 'Navigate between rooms.', ttech: '360° Technology',
                 aiT: 'Advisor Selim', aiS: 'Your Assistant', aiM: 'Welcome. I am Selim, your real estate advisor.', vf: 'Find Your Property', vfd: 'Leave your details.',
-                fn: 'Full Name', fph: 'Phone Number', fno: 'Details', fb: 'Submit', ftxt: "We don't just provide housing." }
+                fn: 'Full Name', fph: 'Phone Number', fno: 'Details', fb: 'Submit', ftxt: "We don't just provide housing.",
+                nh: 'Daily Market News', ns: 'Market News', nr: 'Breaking', nc: 'New Capital', nd: 'Announcements', nw: 'Follow on WhatsApp' }
         };
 
         const defProps = [
@@ -487,13 +519,14 @@
 
         async function loadFromSupabase() {
             if (!useSupabase) return false;
-            const [p, l, a] = await Promise.all([sbFetch('properties'), sbFetch('leads'), sbFetch('ai_knowledge')]);
+            const [p, l, a, n] = await Promise.all([sbFetch('properties'), sbFetch('leads'), sbFetch('ai_knowledge'), sbFetch('market_news')]);
             if (p && p.length) {
                 properties = p.map(x => ({ ...x, images: typeof x.images === 'string' ? JSON.parse(x.images) : (x.images || []) }));
                 saveLocal();
             }
             if (l && l.length) { leads = l; saveLocal(); }
             if (a && a.length) { aiBlocks = a; saveLocal(); }
+            if (n && n.length) { marketNews = n; }
             return !!(p || l || a);
         }
 
@@ -537,7 +570,7 @@
             btnLoad('btn-sync', true);
             const ok = await loadFromSupabase();
             if (ok) {
-                updateUI(); renderLeads(); renderAIList(); renderManaged();
+                loadNews(); updateUI(); renderLeads(); renderAIList(); renderManaged();
                 toast('تم سحب البيانات من Supabase بنجاح.');
             } else {
                 toast('فشل السحب. تأكد من الإعدادات.', false);
@@ -580,7 +613,7 @@
             else if (view === 'detail') { $('view-detail').classList.remove('hidden'); $('header').classList.remove('hidden'); if (param) renderDetail(param); }
             else if (view === 'dashboard') {
                 $('header').classList.add('hidden');
-                if (verified) { $('view-dashboard').classList.remove('hidden'); renderLeads(); renderAIList(); renderManaged();
+                if (verified) { $('view-dashboard').classList.remove('hidden'); renderLeads(); renderAIList(); renderManaged(); renderNewsList();
                     $('cfg-brand').value=config.brand; $('cfg-bg').value=config.bg; $('cfg-phone').value=config.phone; $('cfg-wa').value=config.wa; $('cfg-pass').value=config.pass; }
                 else { $('view-gateway').classList.remove('hidden'); }
             }
@@ -606,7 +639,7 @@
             $('lang-btn').innerHTML = `<span class="material-icons text-sm">language</span><span>${lang==='ar'?'English':'العربية'}</span>`;
             document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
             document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
-            renderCatalog();
+            renderNewsFeed(); renderCatalog();
         }
 
         function toggleLang() { lang = lang === 'ar' ? 'en' : 'ar'; updateUI(); }
@@ -698,10 +731,10 @@
         }
 
         function switchPanel(tab) {
-            ['general','properties','ai','leads'].forEach(k=>{$(k==='general'?'panel-general':'panel-'+k).classList.add('hidden'); $(k==='general'?'tab-general':'tab-'+k).className="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent text-white hover:border-gold/30 transition-all flex items-center gap-2 relative";});
+            ['general','properties','ai','leads','news'].forEach(k=>{$(k==='general'?'panel-general':'panel-'+k).classList.add('hidden'); $(k==='general'?'tab-general':'tab-'+k).className="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent text-white hover:border-gold/30 transition-all flex items-center gap-2 relative";});
             $(tab==='general'?'panel-general':'panel-'+tab).classList.remove('hidden');
             $(tab==='general'?'tab-general':'tab-'+tab).className="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-gold bg-gold/5 transition-all flex items-center gap-2 relative";
-            if(tab==='leads') renderLeads(); if(tab==='ai') renderAIList(); if(tab==='properties') renderManaged();
+            if(tab==='leads') renderLeads(); if(tab==='ai') renderAIList(); if(tab==='properties') renderManaged(); if(tab==='news') renderNewsList();
         }
 
         function saveSettings() {
@@ -803,6 +836,133 @@
         }
 
         // ════════════════════════════════════════════════════════════════
+        //  NEWS
+        // ════════════════════════════════════════════════════════════════
+        function parseStreamable(url) {
+            if (!url || !url.trim()) return '';
+            const m = url.trim().match(/(?:streamable\.com\/)([a-zA-Z0-9]+)/);
+            return m ? `https://streamable.com/e/${m[1]}` : '';
+        }
+
+        async function loadNews() {
+            if (useSupabase) {
+                const n = await sbFetch('market_news');
+                if (n && n.length) { marketNews = n; }
+            }
+            renderNewsFeed();
+        }
+
+        function renderNewsFeed() {
+            const g = $('news-grid'); if (!g) return;
+            g.innerHTML = '';
+            const s = trans[lang];
+            $('news-sub').textContent = s.nh;
+            $('news-title').textContent = s.ns;
+            $('news-desc').textContent = lang === 'ar' ? 'تابع آخر التحديثات' : 'Follow the latest updates';
+
+            if (!marketNews.length) { g.innerHTML = '<div class="col-span-full text-center text-white/30 text-xs py-16">لا توجد أخبار حالياً</div>'; return; }
+
+            marketNews.slice().reverse().forEach(item => {
+                const embedUrl = parseStreamable(item.video_url);
+                const catBadge = item.category === 'عاجل'
+                    ? 'bg-red-600/20 text-red-400 border-red-500/30'
+                    : 'bg-gold/10 text-gold border-gold/20';
+
+                const catLabel = lang === 'ar' ? item.category : (
+                    item.category === 'أخبار السوق' ? 'Market News' :
+                    item.category === 'العاصمة الإدارية' ? 'New Capital' :
+                    item.category === 'عاجل' ? 'Breaking' :
+                    item.category === 'إعلانات هامة' ? 'Announcements' : item.category
+                );
+
+                const waLink = `https://wa.me/${config.wa}?text=${encodeURIComponent(lang === 'ar' ? 'مرحباً، بخصوص خبر: ' + item.title : 'Hello, regarding: ' + item.title)}`;
+
+                g.innerHTML += `<div class="glass-card rounded-2xl overflow-hidden shadow-lg group">
+                    <div class="p-6 text-right flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${catBadge}">${catLabel}</span>
+                            <span class="text-[10px] text-white/30 font-mono">${new Date(item.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {year:'numeric',month:'short',day:'numeric'})}</span>
+                        </div>
+                        <h4 class="serif-title text-base font-bold text-white mb-3 group-hover:text-gold transition-colors">${item.title}</h4>
+                        <div class="text-white/60 text-xs leading-relaxed whitespace-pre-line mb-4 flex-1">${item.content}</div>
+                        ${embedUrl ? `<div class="aspect-video rounded-xl overflow-hidden border border-white/10 mb-4"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
+                        <a href="${waLink}" target="_blank" class="inline-flex items-center gap-1.5 text-[10px] text-green-500 hover:text-green-400 font-bold transition-colors mt-auto">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.488 1.459 5.416 1.46h.007c5.566 0 10.093-4.52 10.097-10.086.002-2.697-1.047-5.232-2.953-7.14C17.29 1.48 14.757.43 12.067.43 6.5.43 1.972 4.953 1.968 10.52c-.001 1.933.504 3.818 1.462 5.422l-.963 3.517 3.6-.944z"/></svg>
+                            ${lang === 'ar' ? 'متابعة عبر واتساب' : 'Follow on WhatsApp'}
+                        </a>
+                    </div>
+                </div>`;
+            });
+        }
+
+        let editingNewsId = null;
+
+        async function addNews() {
+            const title = $('news-title-input').value.trim();
+            const content = $('news-content').value.trim();
+            if (!title || !content) { toast(lang === 'ar' ? 'العنوان والمحتوى مطلوبان' : 'Title and content required', false); return; }
+            btnLoad('btn-news', true);
+
+            if (editingNewsId) {
+                const updates = { title, content, category: $('news-cat').value, video_url: $('news-video').value.trim() };
+                if (useSupabase) await sbUpdate('market_news', editingNewsId, updates);
+                const idx = marketNews.findIndex(n => n.id === editingNewsId);
+                if (idx >= 0) Object.assign(marketNews[idx], updates);
+                editingNewsId = null;
+                $('btn-news-cancel').classList.add('hidden');
+                toast(lang === 'ar' ? 'تم التحديث' : 'Updated');
+            } else {
+                const item = { id: crypto.randomUUID(), title, content, category: $('news-cat').value, video_url: $('news-video').value.trim(), created_at: new Date().toISOString() };
+                marketNews.push(item);
+                if (useSupabase) await sbInsert('market_news', item);
+                toast(lang === 'ar' ? 'تمت الإضافة' : 'Added');
+            }
+
+            $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = '';
+            btnLoad('btn-news', false);
+            renderNewsFeed();
+            renderNewsList();
+        }
+
+        function cancelEditNews() {
+            editingNewsId = null;
+            $('btn-news-cancel').classList.add('hidden');
+            $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = '';
+            $('btn-news').textContent = lang === 'ar' ? 'إضافة' : 'Add';
+        }
+
+        async function deleteNews(id) {
+            if (!confirm(lang === 'ar' ? 'حذف الخبر؟' : 'Delete news?')) return;
+            marketNews = marketNews.filter(n => n.id !== id);
+            if (useSupabase) await sbDelete('market_news', id);
+            renderNewsFeed();
+            renderNewsList();
+            toast(lang === 'ar' ? 'تم الحذف' : 'Deleted');
+        }
+
+        function editNews(id) {
+            const item = marketNews.find(n => n.id === id);
+            if (!item) return;
+            editingNewsId = id;
+            $('news-title-input').value = item.title;
+            $('news-content').value = item.content;
+            $('news-cat').value = item.category || 'أخبار السوق';
+            $('news-video').value = item.video_url || '';
+            $('btn-news-cancel').classList.remove('hidden');
+            $('btn-news').textContent = lang === 'ar' ? 'تحديث' : 'Update';
+            $('news-title-input').focus();
+        }
+
+        function renderNewsList() {
+            const c = $('news-list'); if (!c) return;
+            c.innerHTML = '';
+            if (!marketNews.length) { c.innerHTML = '<p class="text-white/40 text-xs text-center py-8">لا توجد أخبار.</p>'; return; }
+            marketNews.slice().reverse().forEach(n => {
+                c.innerHTML += `<div class="glass-panel p-4 rounded-xl flex items-start justify-between gap-4"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold text-white truncate">${n.title}</span><span class="text-[9px] text-gold border border-gold/20 px-1.5 py-0.5 rounded-full shrink-0">${n.category || 'أخبار السوق'}</span></div><p class="text-[11px] text-white/50 line-clamp-2 whitespace-pre-line">${n.content}</p></div><div class="flex gap-2 shrink-0"><button onclick="editNews('${n.id}')" class="text-gold hover:text-gold-light"><span class="material-icons text-sm">edit</span></button><button onclick="deleteNews('${n.id}')" class="text-red-500 hover:text-red-400"><span class="material-icons text-sm">delete</span></button></div></div>`;
+            });
+        }
+
+        // ════════════════════════════════════════════════════════════════
         //  CHAT
         // ════════════════════════════════════════════════════════════════
         function toggleChat() {
@@ -891,7 +1051,7 @@
             loader(true);
             loadLocal();
             if (useSupabase) { const ok = await loadFromSupabase(); }
-            updateUI(); tour('salon'); navigate('site');
+            loadNews(); updateUI(); tour('salon'); navigate('site');
             setTimeout(()=>loader(false),400);
         };
     </script>
