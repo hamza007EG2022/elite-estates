@@ -1,9 +1,5 @@
 {
     "private": true,
     "name": "elite-estates",
-    "version": "1.0.0",
-    "dependencies": {
-        "@supabase/supabase-js": "latest",
-        "pg": "latest"
-    }
+    "version": "1.0.0"
 }
