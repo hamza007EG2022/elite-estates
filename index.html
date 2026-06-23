@@ -397,16 +397,8 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6dWJ2Z29iYWphYWhjYXhtdnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNjE5MTgsImV4cCI6MjA5NzYzNzkxOH0.ZFg-p8KPG0LDd2pieHs3JPjIhlK-dYYpdiXgOWVocgg';
 
         const useSupabase = SUPABASE_URL.includes('YOUR_PROJECT') === false;
-        let supabase = null;
-        async function initSupabase() {
-            if (!useSupabase) return;
-            try {
-                if (typeof window.supabase === 'undefined') {
-                    await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
-                }
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } catch(e) { console.warn('Supabase init failed'); }
-        }
+        const sbHeaders = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' };
+        const sbUrl = (table) => `${SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/${table}`;
 
         // ════════════════════════════════════════════════════════════════
         //  STATE
@@ -459,46 +451,43 @@
         ];
 
         // ════════════════════════════════════════════════════════════════
-        //  SUPABASE HELPERS
+        //  SUPABASE HELPERS (direct REST API, no library needed)
         // ════════════════════════════════════════════════════════════════
         async function sbFetch(table) {
-            if (!useSupabase || !supabase) return null;
+            if (!useSupabase) return null;
             try {
-                const { data, error } = await supabase.from(table).select('*').order('id', { ascending: true });
-                if (error) throw error;
-                return data;
+                const res = await fetch(`${sbUrl(table)}?select=*&order=id.asc`, { headers: sbHeaders });
+                if (!res.ok) throw new Error(`${res.status}`);
+                return await res.json();
             } catch(e) { console.warn(`Supabase fetch ${table} failed:`, e); return null; }
         }
 
         async function sbInsert(table, row) {
-            if (!useSupabase || !supabase) return false;
+            if (!useSupabase) return false;
             try {
-                const { error } = await supabase.from(table).insert(row);
-                if (error) throw error;
-                return true;
+                const res = await fetch(sbUrl(table), { method: 'POST', headers: sbHeaders, body: JSON.stringify(row) });
+                return res.ok;
             } catch(e) { console.warn(`Supabase insert ${table} failed:`, e); return false; }
         }
 
         async function sbDelete(table, id) {
-            if (!useSupabase || !supabase) return false;
+            if (!useSupabase) return false;
             try {
-                const { error } = await supabase.from(table).delete().eq('id', id);
-                if (error) throw error;
-                return true;
+                const res = await fetch(`${sbUrl(table)}?id=eq.${id}`, { method: 'DELETE', headers: sbHeaders });
+                return res.ok;
             } catch(e) { console.warn(`Supabase delete ${table} failed:`, e); return false; }
         }
 
         async function sbUpdate(table, id, data) {
-            if (!useSupabase || !supabase) return false;
+            if (!useSupabase) return false;
             try {
-                const { error } = await supabase.from(table).update(data).eq('id', id);
-                if (error) throw error;
-                return true;
+                const res = await fetch(`${sbUrl(table)}?id=eq.${id}`, { method: 'PATCH', headers: sbHeaders, body: JSON.stringify(data) });
+                return res.ok;
             } catch(e) { console.warn(`Supabase update ${table} failed:`, e); return false; }
         }
 
         async function loadFromSupabase() {
-            if (!useSupabase || !supabase) return false;
+            if (!useSupabase) return false;
             const [p, l, a] = await Promise.all([sbFetch('properties'), sbFetch('leads'), sbFetch('ai_knowledge')]);
             if (p && p.length) {
                 properties = p.map(x => ({ ...x, images: typeof x.images === 'string' ? JSON.parse(x.images) : (x.images || []) }));
@@ -546,8 +535,6 @@
         // ════════════════════════════════════════════════════════════════
         async function syncFromSupabase() {
             if (!useSupabase) { toast('Supabase غير مهيأ. عبي الـ URL والمفتاح.', false); return; }
-            await initSupabase();
-            if (!supabase) { toast('Supabase غير مهيأ.', false); return; }
             btnLoad('btn-sync', true);
             const ok = await loadFromSupabase();
             if (ok) {
@@ -633,7 +620,7 @@
             document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
             document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
             renderCatalog();
-            updateDBStatus(useSupabase && supabase !== null);
+            updateDBStatus(useSupabase);
         }
 
         function toggleLang() { lang = lang === 'ar' ? 'en' : 'ar'; updateUI(); }
@@ -917,7 +904,6 @@
         window.onload=async()=>{
             loader(true);
             loadLocal();
-            await initSupabase();
             if (useSupabase) {
                 const ok = await loadFromSupabase();
                 updateDBStatus(ok);
