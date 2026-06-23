@@ -135,20 +135,16 @@
 
         <section class="relative z-20 -mt-16 px-6 max-w-6xl mx-auto">
             <div class="glass-panel rounded-2xl p-6 lg:p-8 shadow-2xl">
-                <h3 class="text-gold text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2" id="filter-h"><span class="material-icons text-sm">search</span> تصفية المعروضات</h3>
+                <h3 class="text-gold text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2" id="filter-h"><span class="material-icons text-sm">search</span> بحث</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div><label class="text-[11px] text-white/45 uppercase tracking-wider" id="lbl-type">النوع</label>
-                        <select id="f-type" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold">
-                            <option value="all">الكل</option><option value="villa">فيلا</option><option value="apartment">شقة / بنتهاوس</option><option value="chalet">شاليه</option></select></div>
+                        <select id="f-type" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold"></select></div>
                     <div><label class="text-[11px] text-white/45 uppercase tracking-wider" id="lbl-loc">الموقع</label>
-                        <select id="f-loc" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold">
-                            <option value="all">الكل</option><option value="tagamoa">التجمع الخامس</option><option value="zayed">الشيخ زايد</option><option value="sahel">الساحل الشمالي</option><option value="gouna">الجونة</option></select></div>
+                        <select id="f-loc" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold"></select></div>
                     <div><label class="text-[11px] text-white/45 uppercase tracking-wider" id="lbl-price">السعر</label>
-                        <select id="f-price" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold">
-                            <option value="all">الكل</option><option value="10-20">10-20 مليون</option><option value="20-40">20-40 مليون</option><option value="40+">أكثر من 40</option></select></div>
+                        <select id="f-price" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold"></select></div>
                     <div><label class="text-[11px] text-white/45 uppercase tracking-wider" id="lbl-fin">التشطيب</label>
-                        <select id="f-fin" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold">
-                            <option value="all">الكل</option><option value="ultra">ألترا سوبر لوكس</option><option value="shell">نصف تشطيب</option></select></div>
+                        <select id="f-fin" onchange="filter()" class="w-full bg-charcoal border border-gold/20 rounded-lg text-sm text-white px-4 py-3 outline-none focus:border-gold"></select></div>
                 </div>
             </div>
         </section>
@@ -639,7 +635,7 @@
             $('floating-wa').href = `https://wa.me/${config.wa}?text=${encodeURIComponent(lang==='ar'?'مرحباً':'Hello')}`;
             $('subtitle').textContent = s.sub; $('cta-btn').textContent = s.cta;
             $('hero-title').innerHTML = s.hero; $('hero-desc').textContent = s.hd; $('hero-btn').textContent = s.hb;
-            $('filter-h').innerHTML = `<span class="material-icons text-sm">search</span> ${s.fh}`;
+            $('filter-h').innerHTML = `<span class="material-icons text-sm">search</span> ${lang==='ar'?'بحث':'Search'}`;
             $('lbl-type').textContent=s.ft; $('lbl-loc').textContent=s.fl; $('lbl-price').textContent=s.fp; $('lbl-fin').textContent=s.ff;
             $('cat-sub').textContent=s.cs; $('cat-title').textContent=s.ct; $('cat-desc').textContent=s.cd;
             $('tour-tag').textContent=s.tt; $('tour-title').textContent=s.ttl; $('tour-desc').textContent=s.td; $('tour-tech').textContent=s.ttech;
@@ -650,7 +646,7 @@
             $('lang-btn').innerHTML = `<span class="material-icons text-sm">language</span><span>${lang==='ar'?'English':'العربية'}</span>`;
             document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
             document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
-            renderNewsFeed(); renderCatalog();
+            renderNewsFeed(); buildFilters(); renderCatalog();
         }
 
         function toggleLang() { lang = lang === 'ar' ? 'en' : 'ar'; updateUI(); }
@@ -674,13 +670,65 @@
             });
         }
 
+        function buildFilters() {
+            const typeMap = { villa:'فيلا', apartment:'شقة / بنتهاوس', chalet:'شاليه', shop:'محل', mall:'مول', office:'مكتب', studio:'ستوديو', duplex:'دوبلكس', roof:'روف', townhouse:'تاون هاوس', twinhouse:'توين هاوس' };
+            const locMap = { tagamoa:'التجمع الخامس', zayed:'الشيخ زايد', sahel:'الساحل الشمالي', gouna:'الجونة', madinaty:'مدينتي', october:'6 أكتوبر', newcapital:'العاصمة الإدارية', masrgedida:'مصر الجديدة', sherouk:'الشروق', badr:'بدر', obour:'العبور', mostakbal:'مدينتي المستقبل', sokhna:'العين السخنة', ainSokhna:'العين السخنة', northcoast:'الساحل الشمالي', newcairo:'التجمع الخامس' };
+            const enTypeMap = { villa:'Villa', apartment:'Apartment', chalet:'Chalet', shop:'Shop', mall:'Mall', office:'Office', studio:'Studio', duplex:'Duplex', roof:'Roof', townhouse:'Townhouse', twinhouse:'Twinhouse' };
+            const enLocMap = { tagamoa:'New Cairo', zayed:'Sheikh Zayed', sahel:'North Coast', gouna:'El Gouna', madinaty:'Madinaty', october:'6 October', newcapital:'New Capital', masrgedida:'Heliopolis', sherouk:'El Sherouk', badr:'Badr', obour:'Obour', mostakbal:'Mostakbal City', sokhna:'Ain Sokhna', ainSokhna:'Ain Sokhna', northcoast:'North Coast', newcairo:'New Cairo' };
+
+            // collect unique values from properties
+            const types = [...new Set(properties.map(p => p.type).filter(Boolean))];
+            const locs = [...new Set(properties.map(p => p.location).filter(Boolean))];
+            const fins = [...new Set(properties.map(p => p.finAr).filter(Boolean))];
+            const prices = properties.map(p => p.price).filter(v => !isNaN(v));
+
+            function label(val, map) { return map[val] || val; }
+            function enLabel(val, arMap, enMap) { return enMap[val] || arMap[val] || val; }
+
+            // build type dropdown
+            const typeEl = $('f-type');
+            typeEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + types.map(t => `<option value="${t}">${lang==='ar'?label(t,typeMap): enLabel(t,typeMap,enTypeMap)}</option>`).join('');
+
+            // build location dropdown
+            const locEl = $('f-loc');
+            locEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + locs.map(l => `<option value="${l}">${lang==='ar'?label(l,locMap): enLabel(l,locMap,enLocMap)}</option>`).join('');
+
+            // build finish dropdown
+            const finEl = $('f-fin');
+            finEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + fins.map(f => `<option value="${f}">${f}</option>`).join('');
+
+            // build price dropdown (auto ranges)
+            const priceEl = $('f-price');
+            if (prices.length) {
+                const minP = Math.floor(Math.min(...prices) / 10) * 10;
+                const maxP = Math.ceil(Math.max(...prices) / 10) * 10;
+                let opts = `<option value="all">${lang==='ar'?'الكل':'All'}</option>`;
+                for (let i = minP; i < maxP; i += 10) {
+                    const lo = i, hi = i + 10;
+                    opts += `<option value="${lo}-${hi}">${lo}-${hi} ${lang==='ar'?'مليون':'M'}</option>`;
+                }
+                opts += `<option value="${maxP}+">${maxP}+ ${lang==='ar'?'مليون':'M'}</option>`;
+                priceEl.innerHTML = opts;
+            } else {
+                priceEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>`;
+            }
+        }
+
         function filter() {
             const type=$('f-type').value, loc=$('f-loc').value, price=$('f-price').value, fin=$('f-fin').value;
             let f = [...properties];
             if(type!=='all') f=f.filter(p=>p.type===type);
             if(loc!=='all') f=f.filter(p=>p.location===loc);
-            if(price!=='all') { if(price==='10-20') f=f.filter(p=>p.price>=10&&p.price<=20); else if(price==='20-40') f=f.filter(p=>p.price>20&&p.price<=40); else if(price==='40+') f=f.filter(p=>p.price>40); }
-            if(fin!=='all') { if(fin==='ultra') f=f.filter(p=>p.finAr.includes('ألترا')||p.finEn.toLowerCase().includes('ultra')); else if(fin==='shell') f=f.filter(p=>p.finAr.includes('نصف')||p.finEn.toLowerCase().includes('semi')); }
+            if(price!=='all') {
+                if(price.endsWith('+')) {
+                    const min = parseFloat(price);
+                    f=f.filter(p=>p.price >= min);
+                } else {
+                    const [lo, hi] = price.split('-').map(Number);
+                    f=f.filter(p=>p.price >= lo && p.price <= hi);
+                }
+            }
+            if(fin!=='all') f=f.filter(p=>p.finAr === fin);
             renderCatalog(f);
         }
 
