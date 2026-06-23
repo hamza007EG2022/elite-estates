@@ -101,7 +101,6 @@
                 <span class="text-[9px] uppercase tracking-[0.3em] text-white/50 -mt-1 font-sans" id="subtitle">Private Portfolio</span>
             </a>
             <div class="flex items-center gap-3">
-                <span id="db-status" class="status-badge status-offline"><span class="w-1.5 h-1.5 rounded-full bg-current"></span><span id="db-status-text">محلي</span></span>
                 <button onclick="navigate('dashboard')" class="bg-charcoal border border-white/10 hover:border-gold/30 px-4 py-2 rounded-full flex items-center gap-2 text-white hover:text-gold transition-all text-xs">
                     <span class="material-icons text-sm">admin_panel_settings</span>
                     <span class="hidden md:inline">بوابة الإدارة</span>
@@ -539,7 +538,6 @@
             const ok = await loadFromSupabase();
             if (ok) {
                 updateUI(); renderLeads(); renderAIList(); renderManaged();
-                updateDBStatus(true);
                 toast('تم سحب البيانات من Supabase بنجاح.');
             } else {
                 toast('فشل السحب. تأكد من الإعدادات.', false);
@@ -571,17 +569,6 @@
             msgEl.textContent = msg;
             el.classList.remove('opacity-0','-translate-x-full'); el.classList.add('opacity-100','translate-x-0');
             setTimeout(() => { el.classList.remove('opacity-100','translate-x-0'); el.classList.add('opacity-0','-translate-x-full'); }, 4000);
-        }
-
-        function updateDBStatus(online) {
-            const badge = $('db-status'), text = $('db-status-text');
-            if (online) {
-                badge.className = 'status-badge status-online';
-                text.textContent = 'سحابة';
-            } else {
-                badge.className = 'status-badge status-offline';
-                text.textContent = 'محلي';
-            }
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -620,7 +607,6 @@
             document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
             document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
             renderCatalog();
-            updateDBStatus(useSupabase);
         }
 
         function toggleLang() { lang = lang === 'ar' ? 'en' : 'ar'; updateUI(); }
@@ -904,10 +890,7 @@
         window.onload=async()=>{
             loader(true);
             loadLocal();
-            if (useSupabase) {
-                const ok = await loadFromSupabase();
-                updateDBStatus(ok);
-            }
+            if (useSupabase) { const ok = await loadFromSupabase(); }
             updateUI(); tour('salon'); navigate('site');
             setTimeout(()=>loader(false),400);
         };
