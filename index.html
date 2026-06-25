@@ -181,11 +181,11 @@
                 <p class="text-white/50 text-xs md:text-sm max-w-lg mx-auto mb-10 leading-relaxed font-sans" id="form-desc">اترك بياناتك وسنقوم بالتواصل.</p>
                 <form id="vip-form" onsubmit="submitForm(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
                     <div><label class="text-[11px] text-white/45 uppercase tracking-wider block mb-1" id="lbl-name">الاسم الكريم</label>
-                        <input type="text" id="f-name" required placeholder="أحمد محمد علي" class="w-full bg-charcoal border border-gold/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gold transition-colors">
+                        <input type="text" id="f-name" required placeholder="الاسم ثلاثي" class="w-full bg-charcoal border border-gold/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gold transition-colors">
                         <span id="name-err" class="text-red-500 text-[10px] hidden">الاسم ثلاثي على الأقل</span></div>
                     <div><label class="text-[11px] text-white/45 uppercase tracking-wider block mb-1" id="lbl-phone">رقم الجوال</label>
-                        <input type="tel" id="f-phone" required placeholder="01002345678" class="w-full bg-charcoal border border-gold/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gold transition-colors">
-                        <span id="phone-err" class="text-red-500 text-[10px] hidden">رقم مصري صحيح</span></div>
+                        <input type="tel" id="f-phone" required placeholder="010, 011, 012, 015" class="w-full bg-charcoal border border-gold/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gold transition-colors">
+                        <span id="phone-err" class="text-red-500 text-[10px] hidden">أدخل رقم مصري صحيح (010, 011, 012, 015)</span></div>
                     <div class="md:col-span-2"><label class="text-[11px] text-white/45 uppercase tracking-wider block mb-1" id="lbl-notes">تفاصيل إضافية</label>
                         <textarea id="f-notes" rows="4" class="w-full bg-charcoal border border-gold/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gold transition-colors" placeholder="مواصفات خاصة..."></textarea></div>
                     <button type="submit" id="form-btn" class="md:col-span-2 bg-gold hover:bg-gold-dark text-obsidian py-4 rounded-xl text-xs font-bold transition-all shadow-lg shadow-gold/5 uppercase tracking-wider mt-2">إرسال</button>
