@@ -55,6 +55,10 @@
     </div>
 
     <div class="fixed bottom-6 left-6 z-50 flex flex-col gap-4">
+        <button onclick="toggleChat()" class="flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-gold via-gold-light to-gold-dark text-obsidian rounded-full shadow-2xl transition-all duration-300 hover:scale-110 group relative" title="المستشار سليم">
+            <span class="material-icons text-2xl">smart_toy</span>
+            <span class="absolute right-16 bg-obsidian border border-gold/30 text-white text-xs px-3 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">المستشار الذكي سليم</span>
+        </button>
         <a href="tel:+201000000000" id="floating-phone" class="flex items-center justify-center w-14 h-14 bg-charcoal border border-white/10 hover:border-gold/50 text-gold rounded-full shadow-lg transition-all duration-300 hover:scale-110 group relative" title="اتصل بنا">
             <span class="material-icons text-xl">phone</span>
             <span class="absolute right-16 bg-obsidian border border-gold/30 text-white text-xs px-3 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">اتصال مباشر</span>
@@ -63,6 +67,31 @@
             <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.488 1.459 5.416 1.46h.007c5.566 0 10.093-4.52 10.097-10.086.002-2.697-1.047-5.232-2.953-7.14C17.29 1.48 14.757.43 12.067.43 6.5.43 1.972 4.953 1.968 10.52c-.001 1.933.504 3.818 1.462 5.422l-.963 3.517 3.6-.944z"/></svg>
             <span class="absolute right-16 bg-obsidian border border-gold/30 text-white text-xs px-3 py-1.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">تحدث معنا على واتساب</span>
         </a>
+    </div>
+
+    <div id="chat-widget" class="fixed bottom-24 left-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[500px] glass-panel rounded-2xl shadow-2xl flex flex-col overflow-hidden transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-charcoal border-b border-gold/15 p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center border border-gold/30">
+                    <span class="material-icons text-gold text-lg">smart_toy</span>
+                </div>
+                <div>
+                    <h4 class="serif-title text-sm font-bold text-white tracking-wider" id="chat-title">المستشار سليم</h4>
+                    <p class="text-[9px] text-gold uppercase tracking-widest" id="chat-status">مساعدك العقاري الرقمي الذكي</p>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="text-white/50 hover:text-white"><span class="material-icons text-sm">close</span></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-obsidian/60" id="chat-msgs">
+            <div class="flex items-start gap-2 max-w-[85%]">
+                <div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div>
+                <div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed" id="chat-init">مرحباً بك يا فندم. أنا المستشار العقاري سليم. كيف يمكنني إرشادك اليوم؟</div>
+            </div>
+        </div>
+        <div class="p-3 bg-charcoal/80 border-t border-gold/10 flex gap-2">
+            <input type="text" id="chat-input" placeholder="اكتب سؤالك هنا..." class="flex-1 bg-obsidian border border-gold/20 rounded-lg px-3 py-2.5 text-xs text-white outline-none focus:border-gold transition-colors" onkeypress="if(event.key==='Enter')sendChat()">
+            <button onclick="sendChat()" class="bg-gold hover:bg-gold-dark text-obsidian px-4 rounded-lg flex items-center justify-center transition-all duration-300"><span class="material-icons text-sm">send</span></button>
+        </div>
     </div>
 
     <div id="toast" class="fixed top-24 left-6 z-50 transform -translate-x-full transition-all duration-500 ease-out glass-panel px-6 py-4 rounded-xl border-l-4 border-l-gold shadow-2xl flex items-center gap-3 max-w-sm pointer-events-none opacity-0">
@@ -174,18 +203,6 @@
             </div>
         </section>
 
-        <!-- NEWS GRID ON MAIN -->
-        <section class="py-24 px-6 max-w-7xl mx-auto border-t border-gold/10" id="news-section">
-            <div class="flex flex-col items-center text-center mb-12">
-                <h2 class="serif-title text-2xl md:text-4xl font-light text-white mb-2" id="news-main-title">النشرة العقارية اليومية</h2>
-                <p class="text-white/50 text-xs md:text-sm max-w-lg font-sans mb-4" id="news-main-desc">أخر أخبار السوق العقاري في مصر</p>
-                <button onclick="navigate('news')" class="bg-gold/10 hover:bg-gold border border-gold/30 hover:border-transparent text-gold hover:text-obsidian px-6 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2">
-                    <span class="material-icons text-sm">article</span><span id="news-all-btn">كل الأخبار</span>
-                </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-main-grid"></div>
-        </section>
-
         <section class="py-24 px-6 max-w-4xl mx-auto" id="contact">
             <div class="glass-panel rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden">
                 <div class="absolute -top-12 -left-12 w-32 h-32 bg-gold/5 rounded-full blur-xl"></div>
@@ -294,6 +311,7 @@
                 <div class="lg:col-span-3 border-l border-gold/10 bg-charcoal/20 p-6 flex flex-col gap-2">
                     <button onclick="switchPanel('general')" id="tab-general" class="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-gold bg-gold/5 transition-all flex items-center gap-2"><span class="material-icons text-sm">settings</span> الإعدادات</button>
                     <button onclick="switchPanel('properties')" id="tab-properties" class="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-white transition-all flex items-center gap-2"><span class="material-icons text-sm">add_box</span> العقارات</button>
+                    <button onclick="switchPanel('ai')" id="tab-ai" class="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-white transition-all flex items-center gap-2"><span class="material-icons text-sm">psychology</span> المستشار سليم</button>
                     <button onclick="switchPanel('leads')" id="tab-leads" class="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-white transition-all flex items-center gap-2 relative">
                         <span class="material-icons text-sm">assignment_ind</span> العملاء
                         <span id="leads-badge" class="absolute left-3 top-3 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
@@ -307,11 +325,10 @@
                         <h4 class="serif-title text-base font-bold text-gold border-b border-white/5 pb-2">إعدادات الهوية</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="text-[11px] text-white/50">اسم العلامة</label><input type="text" id="cfg-brand" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
-                            <div><label class="text-[11px] text-white/50">صورة الخلفية</label><input type="file" id="cfg-bg" accept="image/*" class="w-full text-xs text-white file:bg-gold file:border-0 file:text-obsidian file:px-3 file:py-1.5 file:rounded-lg file:font-bold file:cursor-pointer bg-charcoal border border-white/10 rounded-lg px-2 py-1.5 outline-none focus:border-gold"></div>
+                            <div><label class="text-[11px] text-white/50">رابط الخلفية</label><input type="text" id="cfg-bg" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                             <div><label class="text-[11px] text-white/50">رقم الهاتف</label><input type="text" id="cfg-phone" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                             <div><label class="text-[11px] text-white/50">الواتساب</label><input type="text" id="cfg-wa" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                             <div><label class="text-[11px] text-white/50">كلمة السر</label><input type="text" id="cfg-pass" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
-                            <div><label class="text-[11px] text-white/50">أعمدة الأخبار (2-4)</label><input type="number" id="cfg-news-cols" min="2" max="4" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                             <div class="flex items-end gap-2">
                                 <button onclick="saveSettings()" id="btn-save" class="bg-gold hover:bg-gold-dark text-obsidian px-6 py-2.5 rounded-lg text-xs font-bold transition-all">حفظ</button>
                                 <button onclick="syncFromSupabase()" id="btn-sync" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
@@ -328,11 +345,11 @@
                             <div><label class="text-[11px] text-white/50">العنوان (عربي)</label><input type="text" id="p-title-ar" required class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                             <div><label class="text-[11px] text-white/50">العنوان (إنجليزي)</label><input type="text" id="p-title-en" required class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                             <div><label class="text-[11px] text-white/50">النوع</label>
-                                <input type="text" id="p-type" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold" placeholder="فيلا | شقة | شاليه"></div>
+                                <select id="p-type" class="w-full bg-charcoal border border-white/10 rounded-lg text-xs text-white px-4 py-2.5 outline-none focus:border-gold"><option value="villa">فيلا</option><option value="apartment">شقة</option><option value="chalet">شاليه</option></select></div>
                             <div><label class="text-[11px] text-white/50">الموقع</label>
-                                <input type="text" id="p-loc" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold" placeholder="التجمع الخامس | الشيخ زايد"></div>
+                                <select id="p-loc" class="w-full bg-charcoal border border-white/10 rounded-lg text-xs text-white px-4 py-2.5 outline-none focus:border-gold"><option value="tagamoa">التجمع الخامس</option><option value="zayed">الشيخ زايد</option><option value="sahel">الساحل الشمالي</option><option value="gouna">الجونة</option></select></div>
                             <div><label class="text-[11px] text-white/50">السعر (مليون)</label><input type="number" id="p-price" required class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
-                            <div><label class="text-[11px] text-white/50">الصور</label><input type="file" id="p-imgs" accept="image/*" multiple class="w-full text-xs text-white file:bg-gold file:border-0 file:text-obsidian file:px-3 file:py-1.5 file:rounded-lg file:font-bold file:cursor-pointer bg-charcoal border border-white/10 rounded-lg px-2 py-1.5 outline-none focus:border-gold"></div>
+                            <div><label class="text-[11px] text-white/50">الصور (روابط مفصولة بفاصلة)</label><input type="text" id="p-imgs" class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold" placeholder="https://..., https://..."></div>
                             <div class="flex gap-2">
                                 <div><label class="text-[11px] text-white/50">المساحة</label><input type="number" id="p-area" required class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
                                 <div><label class="text-[11px] text-white/50">الغرف</label><input type="number" id="p-beds" required class="w-full bg-charcoal border border-white/10 rounded-lg px-4 py-2.5 text-xs text-white outline-none focus:border-gold"></div>
@@ -350,6 +367,23 @@
                         </div>
                     </div>
 
+                    <!-- AI -->
+                    <div id="panel-ai" class="hidden flex flex-col gap-6">
+                        <div class="flex items-center gap-3 border-b border-white/5 pb-2"><span class="material-icons text-gold">psychology</span><h4 class="serif-title text-base font-bold text-gold">تدريب المستشار سليم</h4></div>
+                        <div class="bg-charcoal/30 border border-gold/20 p-5 rounded-2xl flex flex-col gap-4">
+                            <h5 class="text-xs text-gold font-bold uppercase tracking-wider">إضافة وحدة تدريبية</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label class="text-[10px] text-white/50">الكلمة المفتاحية</label><input type="text" id="ai-topic" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold" placeholder="جمصة"></div>
+                                <div><label class="text-[10px] text-white/50">الحالة</label>
+                                    <select id="ai-status" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold"><option value="active">متاحة</option><option value="sold">مباعة</option></select></div>
+                                <div class="md:col-span-2"><label class="text-[10px] text-white/50">الرد</label><textarea id="ai-content" rows="3" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold"></textarea></div>
+                                <div class="md:col-span-2"><label class="text-[10px] text-white/50">صورة</label><input type="text" id="ai-img" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold"></div>
+                            </div>
+                            <button onclick="addAI()" id="btn-ai" class="bg-gold hover:bg-gold-dark text-obsidian px-5 py-2.5 rounded-lg text-xs font-bold transition-all self-start">إضافة</button>
+                        </div>
+                        <div id="ai-list" class="flex flex-col gap-3"></div>
+                    </div>
+
                     <!-- NEWS -->
                     <div id="panel-news" class="hidden flex flex-col gap-6">
                         <div class="flex items-center gap-3 border-b border-white/5 pb-2"><span class="material-icons text-gold">newspaper</span><h4 class="serif-title text-base font-bold text-gold">إدارة الأخبار</h4></div>
@@ -360,7 +394,6 @@
                                 <div><label class="text-[10px] text-white/50">التصنيف</label>
                                     <select id="news-cat" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold"><option value="أخبار السوق">أخبار السوق</option><option value="العاصمة الإدارية">العاصمة الإدارية</option><option value="عاجل">عاجل</option><option value="إعلانات هامة">إعلانات هامة</option></select></div>
                                 <div><label class="text-[10px] text-white/50">رابط فيديو (Streamable)</label><input type="text" id="news-video" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold" placeholder="https://streamable.com/..."></div>
-                                <div><label class="text-[10px] text-white/50">صورة الخبر</label><input type="file" id="news-img" accept="image/*" class="w-full text-xs text-white file:bg-gold file:border-0 file:text-obsidian file:px-3 file:py-1.5 file:rounded-lg file:font-bold file:cursor-pointer bg-charcoal border border-white/10 rounded-lg px-2 py-1.5 outline-none focus:border-gold"></div>
                             </div>
                             <div><label class="text-[10px] text-white/50">المحتوى (الصق من واتساب Ctrl+V)</label><textarea id="news-content" rows="5" class="w-full bg-charcoal border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold whitespace-pre-line"></textarea></div>
                             <div class="flex gap-3">
@@ -410,10 +443,10 @@
         // ════════════════════════════════════════════════════════════════
         //  STATE
         // ════════════════════════════════════════════════════════════════
-        let lang = 'ar', verified = false;
-        let properties = [], leads = [], marketNews = [];
+        let lang = 'ar', verified = false, chatOpen = false;
+        let properties = [], leads = [], aiBlocks = [], marketNews = [];
         let activeProp = null;
-        let config = { brand: 'ELITE ESTATES', bg: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1920', phone: '+201000000000', wa: '201000000000', pass: 'admin', newsCols: 3 };
+        let config = { brand: 'ELITE ESTATES', bg: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1920', phone: '+201000000000', wa: '201000000000', pass: 'admin' };
 
         const tourRooms = {
             salon: { img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1200', h: { garden: true, master: false } },
@@ -424,13 +457,13 @@
         const trans = {
             ar: { sub: 'معرض العقارات', cta: 'استشارة', hero: 'نخبة العقارات الفاخرة <br><span class="text-gold font-normal">في مصر</span>', hd: 'أعمال حصرية منتقاة بعناية.', hb: 'تصفح المعرض', fh: 'تصفية', ft: 'النوع', fl: 'الموقع', fp: 'السعر', ff: 'التشطيب',
                 cs: 'الوحدات المتاحة', ct: 'كنوز معمارية', cd: 'وحدات مفحوصة قانونياً.', tt: 'تقنية', ttl: 'جولة افتراضية', td: 'تنقل بين الغرف.', ttech: 'تقنية 360°',
-                vf: 'دعنا نجد عقارك', vfd: 'اترك بياناتك.',
+                aiT: 'المستشار سليم', aiS: 'مساعدك الذكي', aiM: 'مرحباً بك يا فندم. أنا سليم، مستشارك العقاري.', vf: 'دعنا نجد عقارك', vfd: 'اترك بياناتك.',
                 fn: 'الاسم الكريم', fph: 'رقم الجوال', fno: 'تفاصيل', fb: 'إرسال', ftxt: 'نحن لا نوفر مساكن، نحن نرسي قواعد الوجاهة.',
                 nh: 'النشرة العقارية اليومية', ns: 'أخبار السوق', nr: 'عاجل', nc: 'العاصمة الإدارية', nd: 'إعلانات هامة', nw: 'واتساب للمتابعة' },
             en: { sub: 'Private Portfolio', cta: 'Consultation', hero: 'Elite Luxury Properties <br><span class="text-gold font-normal">in Egypt</span>', hd: 'Highly curated private listings.', hb: 'Explore Catalog',
                 fh: 'Filter', ft: 'Type', fl: 'Location', fp: 'Price', ff: 'Finish',
                 cs: 'Active Listings', ct: 'Architectural Marvels', cd: 'Legally vetted units.', tt: 'Tech', ttl: 'Virtual Tour', td: 'Navigate between rooms.', ttech: '360° Technology',
-                vf: 'Find Your Property', vfd: 'Leave your details.',
+                aiT: 'Advisor Selim', aiS: 'Your Assistant', aiM: 'Welcome. I am Selim, your real estate advisor.', vf: 'Find Your Property', vfd: 'Leave your details.',
                 fn: 'Full Name', fph: 'Phone Number', fno: 'Details', fb: 'Submit', ftxt: "We don't just provide housing.",
                 nh: 'Daily Market News', ns: 'Market News', nr: 'Breaking', nc: 'New Capital', nd: 'Announcements', nw: 'Follow on WhatsApp' }
         };
@@ -440,6 +473,25 @@
             { id:2, titleAr:'بنتهاوس زجاجي | الشيخ زايد', titleEn:'Glass Penthouse | Zayed', type:'apartment', location:'zayed', price:24, beds:3, baths:4, area:340, finAr:'ألترا سوبر لوكس', finEn:'Ultra Super Lux', descAr:'بنتهاوس بانورامي.', descEn:'Panoramic penthouse.', images:['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=800'] },
             { id:3, titleAr:'فيلا أمواج | الساحل الشمالي', titleEn:'Crystal Waves | North Coast', type:'villa', location:'sahel', price:65, beds:5, baths:6, area:520, finAr:'ألترا سوبر لوكس', finEn:'Ultra Super Lux', descAr:'فيلا صف أول على البحر.', descEn:'First-row sea villa.', images:['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800','https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=800'] }
         ];
+        const defAIVer = 1;
+        const defAI = [
+            { id:1, topic:'جمصة', content:'.', status:'active', image:'' },
+            { id:2, topic:'تقسيط', content:'نظام سداد حتى 7 سنين بدون فوائد بنكية وبعض المطورين يقبلون شيكات.', status:'active', image:'' },
+            { id:3, topic:'التجمع', content:'منطقة حيوية في القاهرة الجديدة، تضم كمبوندات فاخرة وقصور.', status:'active', image:'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=800' },
+            { id:4, topic:'الساحل', content:'الساحل الشمالي وجهة المصيف الأولى بوحدات صف أول ولاف.', status:'active', image:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800' },
+            { id:5, topic:'الشيخ زايد', content:'مدينة الشيخ زايد من أفضل أحياء 6 أكتوبر للفلل والبنتهاوسات.', status:'active', image:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800' },
+            { id:6, topic:'ڤيلا', content:'.', status:'active', image:'' },
+            { id:7, topic:'شقة', content:'.', status:'active', image:'' },
+            { id:8, topic:'بنتهاوس', content:'.', status:'active', image:'' },
+            { id:9, topic:'تمويل', content:'نوفر خطط تمويل مرنة بالتعاون مع البنوك المصرية.', status:'active', image:'' },
+            { id:10, topic:'استلام', content:'جميع الوحدات جاهزة للتسليم الفوري أو خلال 6 شهور.', status:'active', image:'' },
+            { id:11, topic:'مصر الجديدة', content:'منطقة عريقة فيها عمارات وفيلات كلاسيك.', status:'active', image:'' },
+            { id:12, topic:'مستعمل', content:'لدينا وحدات مستعملة بحالة ممتازة بأسعار أقل.', status:'active', image:'' },
+            { id:13, topic:'سعر', content:'الأسعار تبدأ من 18 مليون للشقق وتصل لـ65 مليون للفلل.', status:'active', image:'' },
+            { id:14, topic:'مواصفات', content:'ألترا سوبر لوكس — تشطيب راقي بأعلى الخامات.', status:'active', image:'' },
+            { id:15, topic:'مساحة', content:'وحدات من 250 متر مربع حتى 820 متر.', status:'active', image:'' }
+        ];
+
         // ════════════════════════════════════════════════════════════════
         //  SUPABASE HELPERS (direct REST API, no library needed)
         // ════════════════════════════════════════════════════════════════
@@ -478,14 +530,15 @@
 
         async function loadFromSupabase() {
             if (!useSupabase) return false;
-            const [p, l, n] = await Promise.all([sbFetch('properties'), sbFetch('leads'), sbFetch('market_news')]);
+            const [p, l, a, n] = await Promise.all([sbFetch('properties'), sbFetch('leads'), sbFetch('ai_knowledge'), sbFetch('market_news')]);
             if (p && p.length) {
                 properties = p.map(x => ({ ...x, images: typeof x.images === 'string' ? JSON.parse(x.images) : (x.images || []) }));
                 saveLocal();
             }
             if (l && l.length) { leads = l; saveLocal(); }
+            if (a && a.length) { aiBlocks = a; saveLocal(); }
             if (n && n.length) { marketNews = n; }
-            return !!(p || l || n);
+            return !!(p || l || a);
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -495,7 +548,9 @@
             try {
                 localStorage.setItem('ee_props', JSON.stringify(properties));
                 localStorage.setItem('ee_leads', JSON.stringify(leads));
+                localStorage.setItem('ee_ai', JSON.stringify(aiBlocks));
                 localStorage.setItem('ee_cfg', JSON.stringify(config));
+                localStorage.setItem('ee_ai_ver', String(defAIVer));
             } catch(e) {}
         }
 
@@ -503,12 +558,19 @@
             try {
                 const p = localStorage.getItem('ee_props');
                 const l = localStorage.getItem('ee_leads');
+                const a = localStorage.getItem('ee_ai');
                 const c = localStorage.getItem('ee_cfg');
+                const av = localStorage.getItem('ee_ai_ver');
                 if (p) properties = JSON.parse(p);
                 if (l) leads = JSON.parse(l);
+                if (av !== String(defAIVer) || !a || !JSON.parse(a).length) {
+                    aiBlocks = JSON.parse(JSON.stringify(defAI)); saveLocal();
+                } else if (a) {
+                    aiBlocks = JSON.parse(a);
+                }
                 if (c) Object.assign(config, JSON.parse(c));
                 if (!p || !properties.length) { properties = JSON.parse(JSON.stringify(defProps)); saveLocal(); }
-            } catch(e) { properties = JSON.parse(JSON.stringify(defProps)); }
+            } catch(e) { properties = JSON.parse(JSON.stringify(defProps)); aiBlocks = JSON.parse(JSON.stringify(defAI)); }
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -519,7 +581,7 @@
             btnLoad('btn-sync', true);
             const ok = await loadFromSupabase();
             if (ok) {
-                loadNews(); updateUI(); renderLeads(); renderManaged();
+                loadNews(); updateUI(); renderLeads(); renderAIList(); renderManaged();
                 toast('تم سحب البيانات من Supabase بنجاح.');
             } else {
                 toast('فشل السحب. تأكد من الإعدادات.', false);
@@ -563,8 +625,8 @@
             else if (view === 'news') { $('view-news').classList.remove('hidden'); $('header').classList.remove('hidden'); renderNewsFeed(); }
             else if (view === 'dashboard') {
                 $('header').classList.add('hidden');
-                if (verified) { $('view-dashboard').classList.remove('hidden'); renderLeads(); renderManaged(); renderNewsList();
-                    $('cfg-brand').value=config.brand; $('cfg-phone').value=config.phone; $('cfg-wa').value=config.wa; $('cfg-pass').value=config.pass; $('cfg-news-cols').value=config.newsCols||3; }
+                if (verified) { $('view-dashboard').classList.remove('hidden'); renderLeads(); renderAIList(); renderManaged(); renderNewsList();
+                    $('cfg-brand').value=config.brand; $('cfg-bg').value=config.bg; $('cfg-phone').value=config.phone; $('cfg-wa').value=config.wa; $('cfg-pass').value=config.pass; }
                 else { $('view-gateway').classList.remove('hidden'); }
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -614,19 +676,27 @@
         }
 
         function buildFilters() {
+            const typeMap = { villa:'فيلا', apartment:'شقة / بنتهاوس', chalet:'شاليه', shop:'محل', mall:'مول', office:'مكتب', studio:'ستوديو', duplex:'دوبلكس', roof:'روف', townhouse:'تاون هاوس', twinhouse:'توين هاوس' };
+            const locMap = { tagamoa:'التجمع الخامس', zayed:'الشيخ زايد', sahel:'الساحل الشمالي', gouna:'الجونة', madinaty:'مدينتي', october:'6 أكتوبر', newcapital:'العاصمة الإدارية', masrgedida:'مصر الجديدة', sherouk:'الشروق', badr:'بدر', obour:'العبور', mostakbal:'مدينتي المستقبل', sokhna:'العين السخنة', ainSokhna:'العين السخنة', northcoast:'الساحل الشمالي', newcairo:'التجمع الخامس' };
+            const enTypeMap = { villa:'Villa', apartment:'Apartment', chalet:'Chalet', shop:'Shop', mall:'Mall', office:'Office', studio:'Studio', duplex:'Duplex', roof:'Roof', townhouse:'Townhouse', twinhouse:'Twinhouse' };
+            const enLocMap = { tagamoa:'New Cairo', zayed:'Sheikh Zayed', sahel:'North Coast', gouna:'El Gouna', madinaty:'Madinaty', october:'6 October', newcapital:'New Capital', masrgedida:'Heliopolis', sherouk:'El Sherouk', badr:'Badr', obour:'Obour', mostakbal:'Mostakbal City', sokhna:'Ain Sokhna', ainSokhna:'Ain Sokhna', northcoast:'North Coast', newcairo:'New Cairo' };
+
             // collect unique values from properties
             const types = [...new Set(properties.map(p => p.type).filter(Boolean))];
             const locs = [...new Set(properties.map(p => p.location).filter(Boolean))];
             const fins = [...new Set(properties.map(p => p.finAr).filter(Boolean))];
             const prices = properties.map(p => p.price).filter(v => !isNaN(v));
 
-            // build type dropdown (use raw values)
-            const typeEl = $('f-type');
-            typeEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + types.map(t => `<option value="${t}">${t}</option>`).join('');
+            function label(val, map) { return map[val] || val; }
+            function enLabel(val, arMap, enMap) { return enMap[val] || arMap[val] || val; }
 
-            // build location dropdown (use raw values)
+            // build type dropdown
+            const typeEl = $('f-type');
+            typeEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + types.map(t => `<option value="${t}">${lang==='ar'?label(t,typeMap): enLabel(t,typeMap,enTypeMap)}</option>`).join('');
+
+            // build location dropdown
             const locEl = $('f-loc');
-            locEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + locs.map(l => `<option value="${l}">${l}</option>`).join('');
+            locEl.innerHTML = `<option value="all">${lang==='ar'?'الكل':'All'}</option>` + locs.map(l => `<option value="${l}">${lang==='ar'?label(l,locMap): enLabel(l,locMap,enLocMap)}</option>`).join('');
 
             // build finish dropdown
             const finEl = $('f-fin');
@@ -652,8 +722,8 @@
         function filter() {
             const type=$('f-type').value, loc=$('f-loc').value, price=$('f-price').value, fin=$('f-fin').value;
             let f = [...properties];
-            if(type!=='all') f=f.filter(p=>p.type.toLowerCase().includes(type.toLowerCase()) || (lang==='ar'&&p.type.includes(type)));
-            if(loc!=='all') f=f.filter(p=>p.location.toLowerCase().includes(loc.toLowerCase()) || (lang==='ar'&&p.location.includes(loc)));
+            if(type!=='all') f=f.filter(p=>p.type===type);
+            if(loc!=='all') f=f.filter(p=>p.location===loc);
             if(price!=='all') {
                 if(price.endsWith('+')) {
                     const min = parseFloat(price);
@@ -675,8 +745,8 @@
             activeProp = p;
             const title=lang==='ar'?p.titleAr:p.titleEn, desc=lang==='ar'?p.descAr:p.descEn;
             const price=lang==='ar'?`${p.price}م`:`${p.price}M`;
-            const type=p.type;
-            const loc=p.location;
+            const type=lang==='ar'?({villa:'فيلا',apartment:'بنتهاوس',chalet:'شاليه'}[p.type]||''):p.type.toUpperCase();
+            const loc=lang==='ar'?({tagamoa:'التجمع',zayed:'زايد',sahel:'الساحل',gouna:'الجونة'}[p.location]||''):p.location.toUpperCase();
             const imgs=(p.images&&p.images.length)?p.images:['https://placehold.co/800x600/14161f/c5a880?text=Property'];
             $('d-img').src=imgs[0];
             const tg=$('d-thumbs'); tg.innerHTML='';
@@ -728,26 +798,17 @@
             ['general','properties','ai','leads','news'].forEach(k=>{$(k==='general'?'panel-general':'panel-'+k).classList.add('hidden'); $(k==='general'?'tab-general':'tab-'+k).className="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent text-white hover:border-gold/30 transition-all flex items-center gap-2 relative";});
             $(tab==='general'?'panel-general':'panel-'+tab).classList.remove('hidden');
             $(tab==='general'?'tab-general':'tab-'+tab).className="w-full text-right px-4 py-3 rounded-lg text-xs font-semibold border border-transparent hover:border-gold/30 text-gold bg-gold/5 transition-all flex items-center gap-2 relative";
-            if(tab==='leads') renderLeads(); if(tab==='properties') renderManaged(); if(tab==='news') renderNewsList();
+            if(tab==='leads') renderLeads(); if(tab==='ai') renderAIList(); if(tab==='properties') renderManaged(); if(tab==='news') renderNewsList();
         }
 
         function saveSettings() {
             btnLoad('btn-save',true);
-            config.brand=$('cfg-brand').value||'ELITE ESTATES';
-            const bgFile=$('cfg-bg').files[0];
-            if (bgFile) {
-                const reader=new FileReader();
-                reader.onload=function(e){ config.bg=e.target.result; saveCfg(); };
-                reader.readAsDataURL(bgFile);
-            } else { saveCfg(); }
-            function saveCfg() {
-                config.phone=$('cfg-phone').value||config.phone; config.wa=$('cfg-wa').value||config.wa;
-                config.pass=$('cfg-pass').value||'admin';
-                config.newsCols=parseInt($('cfg-news-cols').value)||3;
-                saveLocal(); updateUI();
-                btnLoad('btn-save',false);
-                toast(lang==='ar'?'تم الحفظ.':'Saved.');
-            }
+            config.brand=$('cfg-brand').value||'ELITE ESTATES'; config.bg=$('cfg-bg').value||config.bg;
+            config.phone=$('cfg-phone').value||config.phone; config.wa=$('cfg-wa').value||config.wa;
+            config.pass=$('cfg-pass').value||'admin';
+            saveLocal(); updateUI();
+            btnLoad('btn-save',false);
+            toast(lang==='ar'?'تم الحفظ.':'Saved.');
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -755,13 +816,7 @@
         // ════════════════════════════════════════════════════════════════
         async function addProp(e) {
             e.preventDefault(); btnLoad('btn-prop',true);
-            const files=$('p-imgs').files; const imgs=[];
-            if (files.length) {
-                for (let i=0; i<files.length; i++) {
-                    const dataUrl=await new Promise(r=>{const f=new FileReader(); f.onload=e=>r(e.target.result); f.readAsDataURL(files[i]);});
-                    imgs.push(dataUrl);
-                }
-            }
+            const imgs=$('p-imgs').value.split(',').map(s=>s.trim()).filter(Boolean);
             const maxId=properties.length?Math.max(...properties.map(p=>p.id)):0;
             const prop={id:maxId+1, titleAr:$('p-title-ar').value, titleEn:$('p-title-en').value, type:$('p-type').value, location:$('p-loc').value,
                 price:parseFloat($('p-price').value), beds:parseInt($('p-beds').value), baths:parseInt($('p-baths').value), area:parseInt($('p-area').value),
@@ -809,6 +864,41 @@
         // ════════════════════════════════════════════════════════════════
         //  AI
         // ════════════════════════════════════════════════════════════════
+        async function addAI() {
+            const topic=$('ai-topic').value.trim(), content=$('ai-content').value.trim();
+            if(!topic||!content){toast(lang==='ar'?'املأ الحقول.':'Fill fields.',false); return;}
+            btnLoad('btn-ai',true);
+            const block={id:Date.now(),topic,content,status:$('ai-status').value,image:$('ai-img').value.trim()};
+            aiBlocks.push(block);
+            if(useSupabase) await sbInsert('ai_knowledge',block);
+            saveLocal(); renderAIList();
+            $('ai-topic').value=''; $('ai-content').value=''; $('ai-img').value='';
+            btnLoad('btn-ai',false);
+            toast(lang==='ar'?'تمت الإضافة.':'Added.');
+        }
+
+        async function toggleAI(id) {
+            const b=aiBlocks.find(x=>x.id===id); if(!b) return;
+            b.status=b.status==='active'?'sold':'active';
+            if(useSupabase) await sbUpdate('ai_knowledge',id,{status:b.status});
+            saveLocal(); renderAIList();
+        }
+
+        async function deleteAI(id) {
+            aiBlocks=aiBlocks.filter(b=>b.id!==id);
+            if(useSupabase) await sbDelete('ai_knowledge',id);
+            saveLocal(); renderAIList();
+            toast(lang==='ar'?'تم الحذف.':'Deleted.');
+        }
+
+        function renderAIList() {
+            const c=$('ai-list'); c.innerHTML='';
+            if(!aiBlocks.length){c.innerHTML='<p class="text-white/40 text-xs text-center py-4">لا توجد وحدات.</p>'; return;}
+            aiBlocks.forEach(b=>{
+                const badge=b.status==='active'?'<span class="bg-green-600/20 text-green-400 text-[9px] px-2 py-0.5 rounded-full">نشط</span>':'<span class="bg-red-600/20 text-red-400 text-[9px] px-2 py-0.5 rounded-full">مباع</span>';
+                const img=b.image?`<img src="${b.image}" class="w-10 h-10 rounded-lg object-cover ml-3">`:''; c.innerHTML+=`<div class="glass-panel p-4 rounded-xl flex items-center justify-between gap-4"><div class="flex items-center">${img}<div><div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold text-white font-mono">[${b.topic}]</span>${badge}</div><p class="text-[11px] text-white/60 line-clamp-2">${b.content}</p></div></div><div class="flex gap-2"><button onclick="toggleAI(${b.id})" class="text-xs text-gold hover:underline">تعديل</button><button onclick="deleteAI(${b.id})" class="text-red-500 hover:text-red-400"><span class="material-icons text-sm">delete</span></button></div></div>`;});
+        }
+
         // ════════════════════════════════════════════════════════════════
         //  NEWS
         // ════════════════════════════════════════════════════════════════
@@ -824,7 +914,6 @@
                 if (n && n.length) { marketNews = n; }
             }
             renderNewsFeed();
-            renderMainNewsGrid();
         }
 
         let newsFilter = 'الكل';
@@ -832,42 +921,6 @@
         function filterNews(cat) {
             newsFilter = cat;
             renderNewsFeed();
-            renderMainNewsGrid();
-        }
-
-        function renderMainNewsGrid() {
-            const g = $('news-main-grid'); if (!g) return;
-            g.innerHTML = '';
-            const cols = config.newsCols || 3;
-            const colClass = cols === 2 ? 'lg:grid-cols-2' : cols === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
-            g.className = `grid grid-cols-1 md:grid-cols-2 ${colClass} gap-6`;
-            if (!marketNews.length) { g.innerHTML = '<div class="text-center text-white/30 text-sm py-16 col-span-full">لا توجد أخبار حالياً</div>'; return; }
-            const titles = $('news-main-title'); const descs = $('news-main-desc'); const allBtn = $('news-all-btn');
-            const s = trans[lang];
-            if (titles) titles.textContent = s.nh;
-            if (descs) descs.textContent = lang === 'ar' ? 'أخر أخبار السوق العقاري في مصر' : 'Latest real estate market news in Egypt';
-            if (allBtn) allBtn.textContent = lang === 'ar' ? 'كل الأخبار' : 'All News';
-
-            marketNews.slice().reverse().slice(0, cols * 2).forEach(item => {
-                const embedUrl = parseStreamable(item.video_url);
-                const catBadge = item.category === 'عاجل' ? 'bg-red-600/20 text-red-400 border-red-500/30' : item.category === 'العاصمة الإدارية' ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30' : item.category === 'إعلانات هامة' ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-gold/10 text-gold border-gold/20';
-                const catLabel = lang === 'ar' ? item.category : (item.category === 'أخبار السوق' ? 'Market News' : item.category === 'العاصمة الإدارية' ? 'New Capital' : item.category === 'عاجل' ? 'Breaking' : item.category === 'إعلانات هامة' ? 'Announcements' : item.category);
-                const dateStr = new Date(item.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {year:'numeric',month:'long',day:'numeric'});
-                const img = item.image_url || ''; // add image_url support
-                g.innerHTML += `<div class="glass-card rounded-2xl overflow-hidden shadow-lg group cursor-pointer" onclick="navigate('news')">
-                    ${img ? `<div class="h-48 overflow-hidden"><img src="${img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt=""></div>` : ''}
-                    ${embedUrl ? `<div class="aspect-video overflow-hidden border-b border-white/5"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
-                    <div class="p-5 text-right">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${catBadge}">${catLabel}</span>
-                            <span class="text-[10px] text-white/30 font-mono">${dateStr}</span>
-                        </div>
-                        <h4 class="serif-title text-base font-bold text-white group-hover:text-gold transition-colors mb-2">${item.title}</h4>
-                        <div class="text-xs text-white/60 whitespace-pre-line line-clamp-3 mb-4" dir="auto">${item.content}</div>
-                        <span class="text-gold text-xs font-bold flex items-center gap-1">${lang === 'ar' ? 'اقرأ المزيد' : 'Read more'} <span class="material-icons text-sm">chevron_left</span></span>
-                    </div>
-                </div>`;
-            });
         }
 
         function renderNewsFeed() {
@@ -920,14 +973,13 @@
                 const dateStr = new Date(item.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {year:'numeric',month:'long',day:'numeric'});
 
                 g.innerHTML += `<div class="news-bubble p-6 md:p-8 flex flex-col">
-                    ${item.image_url ? `<div class="rounded-2xl overflow-hidden border border-white/10 mb-4 -mx-2 -mt-2"><img src="${item.image_url}" class="w-full h-64 object-cover" alt=""></div>` : ''}
-                    ${embedUrl ? `<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 mb-4"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${catBadge}">${catLabel}</span>
                         <span class="text-[11px] text-white/30 font-mono">${dateStr}</span>
                     </div>
                     <h3 class="serif-title text-xl md:text-2xl font-bold text-white mb-4 leading-relaxed">${item.title}</h3>
                     <div class="text-white/80 news-bubble-text whitespace-pre-line mb-6" dir="auto">${item.content}</div>
+                    ${embedUrl ? `<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 mb-6"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
                     <a href="${waLink}" target="_blank" class="self-end inline-flex items-center gap-2 text-sm text-green-500 hover:text-green-400 font-bold transition-colors bg-green-600/10 hover:bg-green-600/20 border border-green-500/20 hover:border-green-500/40 px-4 py-2 rounded-xl w-fit">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.488 1.459 5.416 1.46h.007c5.566 0 10.093-4.52 10.097-10.086.002-2.697-1.047-5.232-2.953-7.14C17.29 1.48 14.757.43 12.067.43 6.5.43 1.972 4.953 1.968 10.52c-.001 1.933.504 3.818 1.462 5.422l-.963 3.517 3.6-.944z"/></svg>
                         ${lang === 'ar' ? 'متابعة عبر واتساب' : 'Follow on WhatsApp'}
@@ -943,15 +995,9 @@
             const content = $('news-content').value.trim();
             if (!title || !content) { toast(lang === 'ar' ? 'العنوان والمحتوى مطلوبان' : 'Title and content required', false); return; }
             btnLoad('btn-news', true);
-            const imgFile = $('news-img').files[0];
-            let image_url = '';
-            if (imgFile) {
-                image_url = await new Promise(r => { const f = new FileReader(); f.onload = e => r(e.target.result); f.readAsDataURL(imgFile); });
-            }
 
             if (editingNewsId) {
                 const updates = { title, content, category: $('news-cat').value, video_url: $('news-video').value.trim() };
-                if (image_url) updates.image_url = image_url;
                 if (useSupabase) await sbUpdate('market_news', editingNewsId, updates);
                 const idx = marketNews.findIndex(n => n.id === editingNewsId);
                 if (idx >= 0) Object.assign(marketNews[idx], updates);
@@ -959,13 +1005,13 @@
                 $('btn-news-cancel').classList.add('hidden');
                 toast(lang === 'ar' ? 'تم التحديث' : 'Updated');
             } else {
-                const item = { id: crypto.randomUUID(), title, content, category: $('news-cat').value, video_url: $('news-video').value.trim(), image_url, created_at: new Date().toISOString() };
+                const item = { id: crypto.randomUUID(), title, content, category: $('news-cat').value, video_url: $('news-video').value.trim(), created_at: new Date().toISOString() };
                 marketNews.push(item);
                 if (useSupabase) await sbInsert('market_news', item);
                 toast(lang === 'ar' ? 'تمت الإضافة' : 'Added');
             }
 
-            $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = ''; $('news-img').value = '';
+            $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = '';
             btnLoad('btn-news', false);
             renderNewsFeed();
             renderNewsList();
@@ -974,7 +1020,7 @@
         function cancelEditNews() {
             editingNewsId = null;
             $('btn-news-cancel').classList.add('hidden');
-            $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = ''; $('news-img').value = '';
+            $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = '';
             $('btn-news').textContent = lang === 'ar' ? 'إضافة' : 'Add';
         }
 
@@ -1005,9 +1051,74 @@
             c.innerHTML = '';
             if (!marketNews.length) { c.innerHTML = '<p class="text-white/40 text-xs text-center py-8">لا توجد أخبار.</p>'; return; }
             marketNews.slice().reverse().forEach(n => {
-                const imgThumb = n.image_url ? `<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0"><img src="${n.image_url}" class="w-full h-full object-cover"></div>` : '';
-                c.innerHTML += `<div class="glass-panel p-4 rounded-xl flex items-start justify-between gap-4"><div class="flex items-center gap-3 flex-1 min-w-0">${imgThumb}<div class="min-w-0"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold text-white truncate">${n.title}</span><span class="text-[9px] text-gold border border-gold/20 px-1.5 py-0.5 rounded-full shrink-0">${n.category || 'أخبار السوق'}</span></div><p class="text-[11px] text-white/50 line-clamp-2 whitespace-pre-line">${n.content}</p></div></div><div class="flex gap-2 shrink-0"><button onclick="editNews('${n.id}')" class="text-gold hover:text-gold-light"><span class="material-icons text-sm">edit</span></button><button onclick="deleteNews('${n.id}')" class="text-red-500 hover:text-red-400"><span class="material-icons text-sm">delete</span></button></div></div>`;
+                c.innerHTML += `<div class="glass-panel p-4 rounded-xl flex items-start justify-between gap-4"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold text-white truncate">${n.title}</span><span class="text-[9px] text-gold border border-gold/20 px-1.5 py-0.5 rounded-full shrink-0">${n.category || 'أخبار السوق'}</span></div><p class="text-[11px] text-white/50 line-clamp-2 whitespace-pre-line">${n.content}</p></div><div class="flex gap-2 shrink-0"><button onclick="editNews('${n.id}')" class="text-gold hover:text-gold-light"><span class="material-icons text-sm">edit</span></button><button onclick="deleteNews('${n.id}')" class="text-red-500 hover:text-red-400"><span class="material-icons text-sm">delete</span></button></div></div>`;
             });
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  CHAT
+        // ════════════════════════════════════════════════════════════════
+        function toggleChat() {
+            const w=$('chat-widget'); chatOpen=!chatOpen;
+            if(chatOpen){w.classList.remove('opacity-0','pointer-events-none','translate-y-10');w.classList.add('opacity-100','translate-y-0');}
+            else{w.classList.add('opacity-0','pointer-events-none','translate-y-10');w.classList.remove('opacity-100','translate-y-0');}
+        }
+
+        async function sendChat() {
+            const inp=$('chat-input'), msgs=$('chat-msgs'), q=inp.value.trim(); if(!q) return;
+            msgs.innerHTML+=`<div class="flex items-start gap-2 max-w-[85%] self-end flex-row-reverse"><div class="w-7 h-7 rounded-full bg-charcoal text-white flex items-center justify-center text-[10px] shrink-0 border border-gold/20">U</div><div class="bg-gold text-obsidian p-3 rounded-xl rounded-tl-none text-xs leading-relaxed font-semibold">${q}</div></div>`;
+            inp.value=''; msgs.scrollTop=msgs.scrollHeight;
+            const thinkId='think-'+Date.now();
+            msgs.innerHTML+=`<div id="${thinkId}" class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div class="flex items-center gap-2"><span class="w-2 h-2 bg-gold rounded-full animate-bounce"></span><span class="w-2 h-2 bg-gold rounded-full animate-bounce" style="animation-delay:0.1s"></span><span class="w-2 h-2 bg-gold rounded-full animate-bounce" style="animation-delay:0.2s"></span></div></div></div>`;
+            msgs.scrollTop=msgs.scrollHeight;
+            let aiFailed=false;
+            try{
+                const res=await fetch('/api/gemini-chat',{
+                    method:'POST',headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({question:q,lang})
+                });
+                if(res.ok){
+                    const data=await res.json();
+                    if(data.reply){
+                        const talk=data.reply.replace(/\n/g,'<br>');
+                        $(thinkId).outerHTML=`<div class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div>${talk}</div></div></div>`;
+                        msgs.scrollTop=msgs.scrollHeight; return;
+                    }
+                }
+            }catch(e){}
+            aiFailed=true;
+            const thinkEl=$(thinkId);
+            if(!thinkEl) return;
+            setTimeout(()=>{
+                let reply='',img=''; const lq=q.toLowerCase();
+                const match=aiBlocks.find(b=>{const t=b.topic.toLowerCase(); return lq.includes(t)||t.includes(lq);});
+                if(match){
+                    if(match.status==='sold') reply=lang==='ar'?`تم البيع. بدائل متاحة.`:`Sold. Alternatives available.`;
+                    else if(match.content&&match.content!=='.'){reply=match.content; if(match.image) img=match.image;}
+                }
+                if(!reply||reply==='.'){
+                    const keywords=lq.replace(/[?؟!,.\s]+/g,' ').trim().split(' ').filter(w=>w.length>2);
+                    const pMatch=properties.filter(p=>{
+                        const t=(p.titleAr+' '+p.titleEn+' '+p.location+' '+p.type).toLowerCase();
+                        return keywords.some(w=>{
+                            if(t.includes(w)) return true;
+                            const stem=w.replace(/^[فوبل]/,'');
+                            return stem.length>2&&(t.includes(stem)||stem.includes(t));
+                        });
+                    });
+                    if(pMatch.length){
+                        const base=pMatch.slice(0,2);
+                        const cards=base.map(p=>`<div class="bg-obsidian/60 rounded-lg p-2 flex gap-2 items-center mt-2"><img src="${p.images[0]}" class="w-12 h-12 rounded object-cover shrink-0"><div class="text-[10px]"><div class="text-white font-semibold">${lang==='ar'?p.titleAr:p.titleEn}</div><div class="text-gold">${p.price}M ${lang==='ar'?'ج':'EGP'}</div></div></div>`).join('');
+                        reply=lang==='ar'?`وجدت ${pMatch.length} عقار مناسب:`:`Found ${pMatch.length} matching properties:`;
+                        img=cards;
+                    } else {
+                        reply=lang==='ar'?'شكراً لاهتمامك. فريقنا سيتواصل معك قريباً لتقديم أفضل العروض.' : 'Thank you. Our team will contact you shortly with the best offers.';
+                    }
+                }
+                const ih=typeof img==='string'&&img.startsWith('<')?`<div class="mt-2 space-y-1">${img}</div>`:img?`<div class="mt-2 rounded-lg overflow-hidden border border-gold/20 h-24 w-full"><img src="${img}" class="w-full h-full object-cover"></div>`:'';
+                thinkEl.outerHTML=`<div class="flex items-start gap-2 max-w-[85%]"><div class="w-7 h-7 rounded-full bg-gold text-obsidian flex items-center justify-center text-[10px] shrink-0 font-bold">S</div><div class="bg-charcoal border border-gold/10 p-3 rounded-xl rounded-tr-none text-xs text-white/90 leading-relaxed"><div>${reply}</div>${ih}</div></div>`;
+                msgs.scrollTop=msgs.scrollHeight;
+            }, aiFailed ? 800 : 200);
         }
 
         // ════════════════════════════════════════════════════════════════
