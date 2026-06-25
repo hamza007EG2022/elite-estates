@@ -174,14 +174,6 @@
             </div>
         </section>
 
-        <section class="py-24 px-6 max-w-5xl mx-auto border-t border-gold/10">
-            <div class="flex items-center justify-between mb-10">
-                <h2 class="serif-title text-2xl md:text-3xl font-light text-white" id="news-main-title">النشرة العقارية اليومية</h2>
-                <button onclick="navigate('news')" class="bg-gold hover:bg-gold-dark text-obsidian px-5 py-2 rounded-full text-xs font-bold transition-all" id="news-main-btn">كل الأخبار</button>
-            </div>
-            <div id="news-main-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </section>
-
         <section class="py-24 px-6 max-w-4xl mx-auto" id="contact">
             <div class="glass-panel rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden">
                 <div class="absolute -top-12 -left-12 w-32 h-32 bg-gold/5 rounded-full blur-xl"></div>
@@ -203,7 +195,7 @@
     </div>
 
     <!-- ===== NEWS VIEW ===== -->
-    <div id="view-news" class="view-panel hidden pt-32 pb-24 px-4 max-w-2xl mx-auto">
+    <div id="view-news" class="view-panel hidden pt-32 pb-24 px-4 max-w-7xl mx-auto">
         <div class="flex flex-col gap-4 mb-8">
             <button onclick="navigate('site')" class="self-start bg-charcoal border border-gold/30 hover:border-gold text-gold hover:scale-105 px-5 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 w-fit">
                 <span class="material-icons text-sm">arrow_back</span><span id="news-back">العودة للرئيسية</span>
@@ -214,7 +206,7 @@
             </div>
             <div class="flex flex-wrap gap-2 justify-center" id="news-filter-tabs"></div>
         </div>
-        <div class="flex flex-col gap-6" id="news-grid"></div>
+        <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
     </div>
 
     <!-- ===== DETAIL VIEW ===== -->
@@ -583,12 +575,10 @@
             $('form-title').textContent=s.vf; $('form-desc').textContent=s.vfd;
             $('lbl-name').textContent=s.fn; $('lbl-phone').textContent=s.fph; $('lbl-notes').textContent=s.fno; $('form-btn').textContent=s.fb;
             $('footer-text').textContent=s.ftxt;
-            $('news-main-title').textContent = lang === 'ar' ? 'النشرة العقارية اليومية' : 'Daily Market News';
-            $('news-main-btn').textContent = lang === 'ar' ? 'كل الأخبار' : 'All News';
             $('lang-btn').innerHTML = `<span class="material-icons text-sm">language</span><span>${lang==='ar'?'English':'العربية'}</span>`;
             document.documentElement.setAttribute('dir', lang==='ar'?'rtl':'ltr');
             document.documentElement.setAttribute('lang', lang==='ar'?'ar':'en');
-            renderMainNewsGrid(); renderNewsFeed(); buildFilters(); renderCatalog();
+            renderNewsFeed(); buildFilters(); renderCatalog();
         }
 
         function toggleLang() { lang = lang === 'ar' ? 'en' : 'ar'; updateUI(); }
@@ -813,7 +803,6 @@
                 if (n && n.length) { marketNews = n; }
             }
             renderNewsFeed();
-            renderMainNewsGrid();
         }
 
         let newsFilter = 'الكل';
@@ -836,6 +825,11 @@
             const navNews = $('nav-news');
             if (navNews) navNews.textContent = lang === 'ar' ? 'النشرة العقارية' : 'Market News';
 
+            // grid columns
+            const cols = config.newsCols || 3;
+            const colClass = cols <= 2 ? 'lg:grid-cols-2' : cols >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
+            g.className = `grid grid-cols-1 md:grid-cols-2 ${colClass} gap-6`;
+
             // build filter tabs
             const tabs = $('news-filter-tabs');
             if (tabs) {
@@ -847,80 +841,40 @@
                 tabs.innerHTML = cats.map(c => `<button onclick="filterNews('${c}')" class="text-xs px-4 py-2 rounded-full border transition-all font-bold ${newsFilter === c ? 'bg-gold text-obsidian border-gold' : 'bg-charcoal text-white/60 border-white/10 hover:border-gold/40 hover:text-white'}">${catMap[c] || c}</button>`).join('');
             }
 
-            if (!marketNews.length) { g.innerHTML = '<div class="text-center text-white/30 text-sm py-16">لا توجد أخبار حالياً</div>'; return; }
+            if (!marketNews.length) { g.innerHTML = '<div class="text-center text-white/30 text-sm py-16 col-span-full">لا توجد أخبار حالياً</div>'; return; }
 
             const filtered = newsFilter === 'الكل' ? marketNews : marketNews.filter(n => n.category === newsFilter);
-            if (!filtered.length) { g.innerHTML = '<div class="text-center text-white/30 text-sm py-16">لا توجد أخبار في هذا التصنيف</div>'; return; }
+            if (!filtered.length) { g.innerHTML = '<div class="text-center text-white/30 text-sm py-16 col-span-full">لا توجد أخبار في هذا التصنيف</div>'; return; }
 
             filtered.slice().reverse().forEach(item => {
                 const embedUrl = parseStreamable(item.video_url);
-                const catBadge = item.category === 'عاجل'
-                    ? 'bg-red-600/20 text-red-400 border-red-500/30'
-                    : item.category === 'العاصمة الإدارية'
-                    ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30'
-                    : item.category === 'إعلانات هامة'
-                    ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
-                    : 'bg-gold/10 text-gold border-gold/20';
-
-                const catLabel = lang === 'ar' ? item.category : (
-                    item.category === 'أخبار السوق' ? 'Market News' :
-                    item.category === 'العاصمة الإدارية' ? 'New Capital' :
-                    item.category === 'عاجل' ? 'Breaking' :
-                    item.category === 'إعلانات هامة' ? 'Announcements' : item.category
-                );
-
-                const waLink = `https://wa.me/${config.wa}?text=${encodeURIComponent(lang === 'ar' ? 'مرحباً، بخصوص خبر: ' + item.title : 'Hello, regarding: ' + item.title)}`;
-                const dateStr = new Date(item.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {year:'numeric',month:'long',day:'numeric'});
-
-                const imgHtml = item.image_url ? `<div class="rounded-2xl overflow-hidden mb-4"><img src="${item.image_url}" class="w-full h-64 object-cover"></div>` : '';
-                g.innerHTML += `<div class="news-bubble p-6 md:p-8 flex flex-col">
-                    ${imgHtml}
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${catBadge}">${catLabel}</span>
-                        <span class="text-[11px] text-white/30 font-mono">${dateStr}</span>
-                    </div>
-                    <h3 class="serif-title text-xl md:text-2xl font-bold text-white mb-4 leading-relaxed">${item.title}</h3>
-                    <div class="text-white/80 news-bubble-text whitespace-pre-line mb-6" dir="auto">${item.content}</div>
-                    ${embedUrl ? `<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 mb-6"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
-                    <a href="${waLink}" target="_blank" class="self-end inline-flex items-center gap-2 text-sm text-green-500 hover:text-green-400 font-bold transition-colors bg-green-600/10 hover:bg-green-600/20 border border-green-500/20 hover:border-green-500/40 px-4 py-2 rounded-xl w-fit">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.488 1.459 5.416 1.46h.007c5.566 0 10.093-4.52 10.097-10.086.002-2.697-1.047-5.232-2.953-7.14C17.29 1.48 14.757.43 12.067.43 6.5.43 1.972 4.953 1.968 10.52c-.001 1.933.504 3.818 1.462 5.422l-.963 3.517 3.6-.944z"/></svg>
-                        ${lang === 'ar' ? 'متابعة عبر واتساب' : 'Follow on WhatsApp'}
-                    </a>
-                </div>`;
-            });
-        }
-
-        function renderMainNewsGrid() {
-            const g = $('news-main-grid'); if (!g) return;
-            g.innerHTML = '';
-            if (!marketNews.length) return;
-            const cols = config.newsCols || 3;
-            const colClass = cols <= 2 ? 'lg:grid-cols-2' : cols >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3';
-            g.className = `grid grid-cols-1 md:grid-cols-2 ${colClass} gap-6`;
-            const items = marketNews.slice().reverse().slice(0, 6);
-            items.forEach(item => {
-                const embedUrl = parseStreamable(item.video_url);
-                const catLabel = lang === 'ar' ? item.category : (
-                    item.category === 'أخبار السوق' ? 'Market News' :
-                    item.category === 'العاصمة الإدارية' ? 'New Capital' :
-                    item.category === 'عاجل' ? 'Breaking' :
-                    item.category === 'إعلانات هامة' ? 'Announcements' : item.category
-                );
                 const catBadge = item.category === 'عاجل' ? 'bg-red-600/20 text-red-400 border-red-500/30'
                     : item.category === 'العاصمة الإدارية' ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30'
                     : item.category === 'إعلانات هامة' ? 'bg-blue-600/20 text-blue-400 border-blue-500/30'
                     : 'bg-gold/10 text-gold border-gold/20';
+                const catLabel = lang === 'ar' ? item.category : (
+                    item.category === 'أخبار السوق' ? 'Market News' :
+                    item.category === 'العاصمة الإدارية' ? 'New Capital' :
+                    item.category === 'عاجل' ? 'Breaking' :
+                    item.category === 'إعلانات هامة' ? 'Announcements' : item.category
+                );
+                const waLink = `https://wa.me/${config.wa}?text=${encodeURIComponent(lang === 'ar' ? 'مرحباً، بخصوص خبر: ' + item.title : 'Hello, regarding: ' + item.title)}`;
                 const dateStr = new Date(item.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {year:'numeric',month:'long',day:'numeric'});
-                const imgHtml = item.image_url ? `<div class="rounded-2xl overflow-hidden mb-3"><img src="${item.image_url}" class="w-full h-48 object-cover"></div>` : '';
+
+                const imgHtml = item.image_url ? `<div class="rounded-xl overflow-hidden mb-3"><img src="${item.image_url}" class="w-full h-48 object-cover"></div>` : '';
                 g.innerHTML += `<div class="glass-card rounded-2xl overflow-hidden p-5 flex flex-col">
                     ${imgHtml}
-                    ${embedUrl ? `<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 mb-3"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
+                    ${embedUrl ? `<div class="aspect-video rounded-xl overflow-hidden border border-white/10 mb-3"><iframe src="${embedUrl}" class="w-full h-full" frameborder="0" scrolling="no" allowfullscreen></iframe></div>` : ''}
                     <div class="flex items-center gap-2 mb-3">
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${catBadge}">${catLabel}</span>
                         <span class="text-[10px] text-white/30 font-mono">${dateStr}</span>
                     </div>
                     <h4 class="serif-title text-base font-bold text-white mb-2 leading-relaxed">${item.title}</h4>
-                    <p class="text-xs text-white/70 line-clamp-3 leading-relaxed">${item.content}</p>
+                    <p class="text-xs text-white/70 line-clamp-3 leading-relaxed mb-4" dir="auto">${item.content}</p>
+                    <a href="${waLink}" target="_blank" class="mt-auto inline-flex items-center gap-1.5 text-xs text-green-500 hover:text-green-400 font-bold transition-colors self-end">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.488 1.459 5.416 1.46h.007c5.566 0 10.093-4.52 10.097-10.086.002-2.697-1.047-5.232-2.953-7.14C17.29 1.48 14.757.43 12.067.43 6.5.43 1.972 4.953 1.968 10.52c-.001 1.933.504 3.818 1.462 5.422l-.963 3.517 3.6-.944z"/></svg>
+                        ${lang === 'ar' ? 'متابعة' : 'Follow'}
+                    </a>
                 </div>`;
             });
         }
@@ -958,7 +912,6 @@
             $('news-title-input').value = ''; $('news-content').value = ''; $('news-video').value = ''; $('news-img').value = '';
             btnLoad('btn-news', false);
             renderNewsFeed();
-            renderMainNewsGrid();
             renderNewsList();
         }
 
@@ -974,7 +927,6 @@
             marketNews = marketNews.filter(n => n.id !== id);
             if (useSupabase) await sbDelete('market_news', id);
             renderNewsFeed();
-            renderMainNewsGrid();
             renderNewsList();
             toast(lang === 'ar' ? 'تم الحذف' : 'Deleted');
         }
