@@ -446,7 +446,10 @@
         async function sbFetch(table) {
             if (!useSupabase) return null;
             try {
-                const res = await fetch(`${sbUrl(table)}?select=*&order=id.asc`, { headers: sbHeaders });
+                const ctrl = new AbortController();
+                const tid = setTimeout(() => ctrl.abort(), 8000);
+                const res = await fetch(`${sbUrl(table)}?select=*&order=id.asc`, { headers: sbHeaders, signal: ctrl.signal });
+                clearTimeout(tid);
                 if (!res.ok) throw new Error(`${res.status}`);
                 return await res.json();
             } catch(e) { console.warn(`Supabase fetch ${table} failed:`, e); return null; }
@@ -1031,10 +1034,14 @@
         // ════════════════════════════════════════════════════════════════
         window.onload=async()=>{
             loader(true);
+            const safetyTimer = setTimeout(()=>loader(false), 5000);
             loadLocal();
-            if (useSupabase) { const ok = await loadFromSupabase(); }
+            try {
+                if (useSupabase) { await loadFromSupabase(); }
+            } catch(e) { console.warn('Init error:', e); }
             loadNews(); updateUI(); tour('salon'); navigate('site');
-            setTimeout(()=>loader(false),400);
+            clearTimeout(safetyTimer);
+            setTimeout(()=>loader(false), 400);
         };
     </script>
 </body>
